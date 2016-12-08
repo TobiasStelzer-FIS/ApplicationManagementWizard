@@ -1,0 +1,100 @@
+<core:FragmentDefinition height="100%" xmlns:layout="sap.ui.layout" xmlns:form="sap.ui.layout.form" xmlns:core="sap.ui.core" xmlns="sap.m">
+	<Page id="wizardReviewPage" title="Bewerbung überpüfen">
+		<content>
+			<form:Form title="{i18n>wizardSteptitle1}" minWidth="1024" editable="false">
+				<form:layout>
+					<form:ResponsiveGridLayout/>
+				</form:layout>
+				<form:FormContainer>
+					<form:title>
+						<core:Title text="{i18n>wizardPersonalData}"/>
+					</form:title>
+					<form:FormElement label="{i18n>wizardGender}">
+						<Text text="{bewerberModel>/Geschlecht}"/>
+					</form:FormElement>
+					<form:FormElement label="{i18n>wizardSurname}">
+						<Text text="{bewerberModel>/Nachname}"/>
+					</form:FormElement>
+					<form:FormElement label="{i18n>wizardForename}">
+						<Text text="{bewerberModel>/Vorname}"/>
+					</form:FormElement>
+					<form:FormElement label="{i18n>wizardBirthdate}">
+						<Text text="{bewerberModel>/Geburtsdatum}"/>
+					</form:FormElement>
+					<form:FormElement label="{i18n>wizardStreet}">
+						<Text text="{bewerberModel>/StrasseHnr}"/>
+					</form:FormElement>
+					<form:FormElement label="{i18n>wizardZipCity}">
+						<Text text="{bewerberModel>/Postleitzahl} {bewerberModel>/Ort}"/>
+					</form:FormElement>
+				</form:FormContainer>
+				<form:FormContainer>
+					<form:title>
+						<core:Title text="{i18n>wizardContactData}"/>
+					</form:title>
+					<form:FormElement label="{i18n>wizardEmail}">
+						<Text text="{bewerberModel>/Email}"/>
+					</form:FormElement>
+					<form:FormElement label="{i18n>wizardPhone}">
+						<Text text="{bewerberModel>/Telefon}"/>
+					</form:FormElement>
+					<form:FormElement label="{i18n>wizardMobile}">
+						<Text text="{bewerberModel>/Mobil}"/>
+						<Link press="editStepOne" text="Edit"/>
+					</form:FormElement>
+				</form:FormContainer>
+			</form:Form>
+			<form:Form title="{i18n>wizardSteptitle2}" editable="false">
+				<form:layout>
+					<form:ResponsiveGridLayout/>
+				</form:layout>
+				<form:FormContainer formElements="{path: 'bewerberModel>/Stellen'}" visible="{= ${bewerberModel>/Stellen}.length !== 0}">
+					<form:title>
+						<core:Title text="Stellen"/>
+					</form:title>
+					<form:FormElement
+						label="{parts: [{path: 'bewerberModel>/Stellen'}, {path: 'bewerberModel>Id'}], formatter: '.formatter.formatLabelStellen'}">
+						<Text text="• {bewerberModel>Bezeichnung}"/>
+					</form:FormElement>
+				</form:FormContainer>
+				<form:FormContainer visible="{= ${bewerberModel>/Stellen}.length === 0}">
+					<form:title>
+						<core:Title text="Stellen"/>
+					</form:title>
+					<form:FormElement label="Stellen">
+						<Text text="Keine Stellen (Initiativbewerbung)"/>
+						<Link press="editStepTwo" text="Edit" visible="false"/>
+					</form:FormElement>
+				</form:FormContainer>
+				<form:FormContainer formElements="{path: 'bewerberModel>/Quellen'}" visible="{= ${bewerberModel>/Quellen}.length !== 0}">
+					<form:title>
+						<core:Title text="Quellen"/>
+					</form:title>
+					<form:FormElement
+						label="{parts: [{path: 'bewerberModel>/Quellen'}, {path: 'bewerberModel>Id'}], formatter: '.formatter.formatLabelQuellen'}">
+						<Text text="• {bewerberModel>Bezeichnung}"/>
+						<Link press="editStepTwo" text="Edit"
+							visible="{parts: [{path: 'bewerberModel>/Quellen'}, {path: 'bewerberModel>Id'}], formatter: '.formatter.formatVisibleIfLast'}"/>
+					</form:FormElement>
+				</form:FormContainer>
+				<form:FormContainer visible="{= ${bewerberModel>/Quellen}.length === 0}">
+					<form:title>
+						<core:Title text="Quellen"/>
+					</form:title>
+					<form:FormElement label="Quellen">
+						<Text text="Keine Quellen"/>
+						<Link press="editStepTwo" text="Edit"/>
+					</form:FormElement>
+				</form:FormContainer>
+			</form:Form>
+		</content>
+		<footer>
+			<Bar>
+				<contentRight>
+					<Button text="Submit" press="onWizardSubmit"></Button>
+					<Button text="Cancel" press="onWizardCancel"></Button>
+				</contentRight>
+			</Bar>
+		</footer>
+	</Page>
+</core:FragmentDefinition>

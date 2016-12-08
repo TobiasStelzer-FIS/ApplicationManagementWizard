@@ -1,0 +1,103 @@
+{
+	"_version": "1.1.0",
+	"sap.app": {
+		"_version": "1.1.0",
+		"id": "de.fis.applicationwizard",
+		"type": "application",
+		"i18n": "i18n/i18n.properties",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"title": "{{appTitle}}",
+		"description": "{{appDescription}}",
+		"resources": "resources.json",
+		"ach": "ach",
+		"dataSources": {
+			"bewerbungservice": {
+				"uri": "https://trial.apim1.hanatrial.ondemand.com:443/p1942281469trial/v1/fis/bewerbungtest/"
+			}
+		}
+	},
+	"sap.ui": {
+		"_version": "1.1.0",
+		"technology": "UI5",
+		"icons": {
+			"icon": "",
+			"favIcon": "",
+			"phone": "",
+			"phone@2": "",
+			"tablet": "",
+			"tablet@2": ""
+		},
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		},
+		"supportedThemes": ["sap_hcb", "sap_bluecrystal", "sap_belize"]
+	},
+	"sap.ui5": {
+		"_version": "1.1.0",
+		"rootView": {
+			"viewName": "de.fis.applicationwizard.view.App",
+			"type": "XML"
+		},
+		"dependencies": {
+			"minUI5Version": "1.30.0",
+			"libs": {
+				"sap.ui.core": {},
+				"sap.m": {},
+				"sap.ui.layout": {}
+			}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		},
+		"models": {
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "de.fis.applicationwizard.i18n.i18n"
+				}
+			},
+			"dataModel": {
+				"dataSource": "bewerbungservice",
+				"type": "sap.ui.model.odata.v2.ODataModel",
+				"settings": {
+					"defaultBindingMode": "TwoWay"
+				}
+			}
+		},
+		"resources": {
+			"css": [{
+				"uri": "css/style.css"
+			}]
+		},
+		"routing": {
+			"config": {
+				"routerClass": "sap.m.routing.Router",
+				"viewType": "XML",
+				"viewPath": "de.fis.applicationwizard.view",
+				"controlId": "appId",
+				"clearTarget": "false",
+				"async": true
+			},
+			"routes": [{
+				"pattern": "",
+				"name": "ApplicationWizard",
+				"target": "ApplicationWizard"
+			}],
+			"targets": {
+				"ApplicationWizard": {
+					"viewName": "Wizard",
+					"controlAggregation": "pages"
+				},
+				"ReviewPage": {
+					"viewName": "ReviewPage",
+					"controlAggregation": "pages"
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,127 @@
+<mvc:View controllerName="de.fis.applicationwizard.controller.Wizard" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:form="sap.ui.layout.form" xmlns:u="sap.ui.unified" xmlns="sap.m">
+	<NavContainer id="wizardNavContainer">
+		<Page id="wizardContentPage" title="Bewerbung anlegen">
+			<Wizard id="CreateApplicationWizard" finishButtonText="{i18n>wizardFinishButtonText}" complete="onWizardCompleted">
+				<WizardStep title="{i18n>wizardSteptitle1}" validated="true">
+					<form:SimpleForm id="formBewerber" editable="true">
+						<core:Title text="{i18n>wizardPersonalData}"/>
+						<Label text="{i18n>wizardGender}"/>
+						<ComboBox selectedKey="{dataModel>Geschlecht}">
+							<core:Item key="m" text="{i18n>wizardMale}"/>
+							<core:Item key="w" text="{i18n>wizardFemale}"/>
+						</ComboBox>
+						<Label text="{i18n>wizardSalutation}"/>
+						<Input value="{dataModel>Anrede}"/>
+						<Label text="{i18n>wizardSurname}"/>
+						<Input value="{dataModel>Nachname}"/>
+						<Label text="{i18n>wizardForename}"/>
+						<Input value="{dataModel>Vorname}"/>
+						<Label text="{i18n>wizardBirthdate}"/>
+						<Input value="{dataModel>Geburtsdatum}"/>
+						<Label text="{i18n>wizardStreet}"/>
+						<Input value="{dataModel>StrasseHnr}"/>
+						<Label text="{i18n>wizardZipCity}"/>
+						<Input value="{dataModel>Postleitzahl}"/>
+						<Input value="{dataModel>Ort}"/>
+						<core:Title text="{i18n>wizardContactData}"/>
+						<Label text="{i18n>wizardEmail}"/>
+						<Input value="{dataModel>Email}"/>
+						<Label text="{i18n>wizardPhone}"/>
+						<Input value="{dataModel>Telefonnummer}"/>
+						<Label text="{i18n>wizardMobile}"/>
+						<Input value="{dataModel>Handynummer}"/>
+					</form:SimpleForm>
+				</WizardStep>
+				<WizardStep validated="true" title="{i18n>wizardSteptitle2}" activate="additionalInfoValidation">
+					<form:SimpleForm editable="true">
+						<core:Title text="Stellen"/>
+						<MultiComboBox items="{path: 'dataModel>/Stelles', sorter: {path: 'Bezeichnung'}}" selectionFinish="onStellenFinished">
+							<core:Item key="{dataModel>StelleId}" text="{dataModel>Bezeichnung}"/>
+						</MultiComboBox>
+						<core:Title text="Quellen"/>
+						<MultiComboBox items="{path: 'bewerberModel>/Quellen'}" selectionFinish="onQuellenFinished">
+							<core:Item key="{bewerberModel>Id}" text="{bewerberModel>Bezeichnung}"/>
+						</MultiComboBox>
+					</form:SimpleForm>
+					<!--
+				<HBox>
+					<Table id="tableStellen" items="{path: 'bewerberModel>/Stellen'}" noDataText="{i18n>wizardNoDataTextStellen}" inset="true" mode="Delete" delete="onDeleteStelle"
+						updateFinished="onStellenUpdateFinished">
+						<headerToolbar>
+							<Toolbar>
+								<Title text="{wizardView>/stellenTitle}" level="H2"/>
+								<ToolbarSpacer/>
+								<Button icon="sap-icon://add" press="onAddStelle"/>
+							</Toolbar>
+						</headerToolbar>
+						<items>
+							<ColumnListItem>
+								<Text text="{bewerberModel>Bezeichnung}"/>
+							</ColumnListItem>
+						</items>
+					</Table>
+					<Table id="tableQuellen" items="{path: 'bewerberModel>/Quellen'}" noDataText="{i18n>wizardNoDataTextQuellen}" inset="true" mode="Delete" delete="onDeleteQuelle"
+						updateFinished="onQuellenUpdateFinished">
+						<headerToolbar>
+							<Toolbar>
+								<Title text="{wizardView>/quellenTitle}" level="H2"/>
+								<ToolbarSpacer/>
+								<Button icon="sap-icon://add" press="onAddQuelle"/>
+							</Toolbar>
+						</headerToolbar>
+						<items>
+							<ColumnListItem>
+								<Text text="{bewerberModel>Bezeichnung}"/>
+							</ColumnListItem>
+						</items>
+					</Table>
+				</HBox>
+-->
+				</WizardStep>
+				<WizardStep validated="true" title="{i18n>wizardSteptitle3}" activate="">
+					<l:Grid defaultSpan="XL6 L6 M12 S12" defaultIndent="XL0 L0 M0 S0">
+						<Table id="tableDateien" items="{path: 'bewerberModel>/Dateien'}" noDataText="{i18n>wizardNoDataTextDateien}" inset="true" mode="Delete"
+							delete="onDeleteDatei" updateFinished="onDateienUpdateFinished">
+							<headerToolbar>
+								<Toolbar>
+									<Title text="{wizardView>/dateienTitle}" level="H2"/>
+									<ToolbarSpacer/>
+									<Button icon="sap-icon://add" press="onAddDatei"/>
+								</Toolbar>
+							</headerToolbar>
+							<items>
+								<ColumnListItem>
+									<Text text="{bewerberModel>Anzeigetext}"/>
+								</ColumnListItem>
+							</items>
+						</Table>
+						<l:VerticalLayout class="sapUiLargeMarginTop">
+							<Title text="Foto" level="H2"/>
+							<u:FileUploader id="fileUploader" name="myFileUpload" uploadUrl="upload/" width="400px" tooltip="Upload your file to the local server"
+								uploadComplete="onUploadComplete"/>
+							<Button text="Hochladen" press="onUploadPress"/>
+						</l:VerticalLayout>
+					</l:Grid>
+					<!--
+						<Table id="tableFoto" items="{path: 'bewerberModel>/Fotos'}" noDataText="{i18n>wizardNoDataTextFoto}" inset="true" mode="Delete"
+							delete="onDeleteFoto" updateFinished="onFotoUpdateFinished">
+							<headerToolbar>
+								<Toolbar>
+									<Title text="{wizardView>/fotoTitle}" level="H2"/>
+									<ToolbarSpacer/>
+									<Button icon="sap-icon://add" press="onAddFoto" visible="{= !${wizardView>/fotoVorhanden}}"/>
+								</Toolbar>
+							</headerToolbar>
+							<items>
+								<ColumnListItem>
+									<Text text="{bewerberModel>Dateiname}"/>
+								</ColumnListItem>
+							</items>
+						</Table>
+-->
+				</WizardStep>
+			</Wizard>
+		</Page>
+	</NavContainer>
+</mvc:View>

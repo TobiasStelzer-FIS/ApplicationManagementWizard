@@ -1,0 +1,19 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns:commons="sap.ui.commons" xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form" xmlns="sap.m">
+	<Dialog title="{i18n>wizardSelectStellenDialogTitle}">
+			<subHeader>
+				<Toolbar>
+					<SearchField width="100%" placeholder="{i18n>wizardSelectStellenSearchFieldPlaceholder}" search="onStellenSearch" liveChange="onStellenSearch"/>
+				</Toolbar>
+			</subHeader>
+			<List id="listSelectStellen" items="{path: 'dataModel>/Stelles', sorter: {path: 'Bezeichnung'}}" mode="MultiSelect">
+				<StandardListItem title="{dataModel>Bezeichnung}"/>
+			</List>
+			<beginButton>
+				<Button id="btnDetailsSave" text="{i18n>wizardSelectStellenSave}" press="onDialogSave"/>
+			</beginButton>
+			<endButton>
+				<Button id="btnDetailsCancel" text="{i18n>wizardSelectStellenCancel}" press="onDialogCancel"/>
+			</endButton>
+	</Dialog>
+</core:FragmentDefinition>
