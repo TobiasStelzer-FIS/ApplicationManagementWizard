@@ -65,8 +65,10 @@ sap.ui.define([
 		_onMetadataLoaded: function(oEvent) {
 			var oDataModel = this.getModel("dataModel");
 			var oEntryBewerber = oDataModel.createEntry("Bewerbers");
-			var oEntryBewerbung = oDataModel.createEntry("/Bewerbungs");
-			
+			var oEntryBewerbung = oDataModel.createEntry("Bewerbungs");
+			var key = oDataModel.getKey(oEntryBewerber.getPath());
+			var path = oEntryBewerbung.getPath() + "/Bewerber";
+			oDataModel.setProperty(path, key);
 			var oForm = this.getView().byId("formBewerber");
 			oForm.setBindingContext(oEntryBewerber, "dataModel");
 		},
