@@ -18,7 +18,7 @@
 						<Label text="{i18n>wizardForename}"/>
 						<Input value="{newModel>Firstname}"/>
 						<Label text="{i18n>wizardBirthdate}"/>
-						<Input value="{newModel>Birthdate}"/>
+						<DatePicker value="{newModel>Birthdate}"/>
 						<Label text="{i18n>wizardStreet}"/>
 						<Input value="{newModel>Street}"/>
 						<Label text="{i18n>wizardZipCity}"/>
