@@ -15,40 +15,25 @@ sap.ui.define([
 		onInit: function() {
 			var oView = this.getView();
 
-			var oDataModel = this.getModel("dataModel");
+			var oDataModel = this.getModel("newModel");
 			oDataModel.metadataLoaded().then(this._onMetadataLoaded.bind(this));
-			
-//			oDataModel.setProperty(oEntryBewerber.getPath() + "/Nachname", "Stelzer", {
-//				bAsync: false
-//			});
-			
+
+			//			oDataModel.setProperty(oEntryBewerber.getPath() + "/Nachname", "Stelzer", {
+			//				bAsync: false
+			//			});
+
 			this._oWizard = oView.byId("CreateApplicationWizard");
 			this._oNavContainer = oView.byId("wizardNavContainer");
 			this._oWizardContentPage = this.getView().byId("wizardContentPage");
 			this._oReviewPage = sap.ui.xmlfragment("de.fis.applicationwizard.view.fragment.ReviewPage", this);
 
 			this._oNavContainer.addPage(this._oReviewPage);
-			
+
+			this._oApplicant = {};
+
 			this._currentDialog = {};
 			this._dialogs = []; // this will store the instantiated dialogs 
-//			this._getDialog("DialogStellen");
-
-			var oModel = new JSONModel({
-				"Geschlecht": "",
-				"Nachname": "",
-				"Vorname": "",
-				"Geburtsdatum": "",
-				"StrasseHnr": "",
-				"Postleitzahl": "",
-				"Ort": "",
-				"Email": "",
-				"Telefon": "",
-				"Mobil": "",
-				"Fotos": [],
-				"Stellen": [],
-				"Quellen": [],
-				"Dateien": []
-			});
+			//			this._getDialog("DialogStellen");
 
 			var oViewModel = new JSONModel({
 				"stellenTitle": this.getResourceBundle().getText("wizardStellenTitleWithCount", [0]),
@@ -59,18 +44,44 @@ sap.ui.define([
 			});
 
 			this.setModel(oViewModel, "wizardView");
-			this.setModel(oModel, "bewerberModel");
 		},
-		
+
 		_onMetadataLoaded: function(oEvent) {
-			var oDataModel = this.getModel("dataModel");
-			var oEntryBewerber = oDataModel.createEntry("Bewerbers");
-			var oEntryBewerbung = oDataModel.createEntry("Bewerbungs");
-			var key = oDataModel.getKey(oEntryBewerber.getPath());
-			var path = oEntryBewerbung.getPath() + "/Bewerber";
-			oDataModel.setProperty(path, key);
+			var oDataModel = this.getModel("newModel");
+			this._oApplicant = oDataModel.createEntry("Applicants", {
+				success: function(oData) {
+					console.log(oData);
+
+				}.bind(this)
+			});
+			oDataModel.setProperty(this._oApplicant.getPath() + "/Birthdate", "/Date(1481583600000)/");
+
+			var oModel = this.getModel("newModel");
+			var newApplicant = {
+				"Gender": "m",
+				"Salutation": "Herr",
+				"Firstname": "Tobias",
+				"Lastname": "Stelzer",
+				"Birthdate": "/Date(1481583600000)/",
+				"Street": "Goethestraße 56",
+				"Zipcode": "97493",
+				"City": "Bergrheinfeld",
+				"Email": "t.stelzer@fis-gmbh.de",
+				"Phone": "09713 1234712",
+				"Mobile": "18 23123 129837"
+			};
+
+			oModel.create("/Applicants", newApplicant, {
+				success: function(oData, response) {
+					var newApplication = {
+						"EnteredBy": "Maria Stürmer",
+						"EnteredOn": "/Date(1481583600000)/"
+					};
+					oModel.create("/Applicants('"+oData.ApplicantId+"')/Applications", newApplication);
+				}
+			});
 			var oForm = this.getView().byId("formBewerber");
-			oForm.setBindingContext(oEntryBewerber, "dataModel");
+			oForm.setBindingContext(this._oApplicant, "newModel");
 		},
 
 		/* =========================================================== */
@@ -98,26 +109,27 @@ sap.ui.define([
 			this._currentDialog.close();
 		},
 
-		_handleNavigationToStep : function (iStepNumber) {
+		_handleNavigationToStep: function(iStepNumber) {
 			var that = this;
-			function fnAfterNavigate () {
+
+			function fnAfterNavigate() {
 				that._oWizard.goToStep(that._oWizard.getSteps()[iStepNumber]);
 				that._oNavContainer.detachAfterNavigate(fnAfterNavigate);
 			}
- 
+
 			this._oNavContainer.attachAfterNavigate(fnAfterNavigate);
 			this._backToWizardContent();
 		},
-		
-		_backToWizardContent : function () {
+
+		_backToWizardContent: function() {
 			this._oNavContainer.backToPage(this._oWizardContentPage.getId());
 		},
-		
-		_handleMessageBoxOpen : function (sMessage, sMessageBoxType) {
+
+		_handleMessageBoxOpen: function(sMessage, sMessageBoxType) {
 			var that = this;
 			MessageBox[sMessageBoxType](sMessage, {
 				actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-				onClose: function (oAction) {
+				onClose: function(oAction) {
 					if (oAction === MessageBox.Action.YES) {
 						that._handleNavigationToStep(0);
 						that._oWizard.discardProgress(that._oWizard.getSteps()[0]);
@@ -129,33 +141,33 @@ sap.ui.define([
 		/* =========================================================== */
 		/* event handlers general                                      */
 		/* =========================================================== */
-		
+
 		onWizardCompleted: function() {
 			this._oNavContainer.to(this._oReviewPage);
 		},
-		
+
 		onWizardCancel: function() {
 			var sText = this.getResourceBundle().getText("wizardDialogCancel");
 			this._handleMessageBoxOpen(sText, "warning");
 		},
-		
+
 		onWizardSubmit: function() {
 			var sText = this.getResourceBundle().getText("wizardDialogSubmit");
 			this._handleMessageBoxOpen(sText, "confirm");
 		},
-	
+
 		/* =========================================================== */
 		/* event handlers review page                                  */
-		/* =========================================================== */	
-		
+		/* =========================================================== */
+
 		editStepOne: function() {
 			this._handleNavigationToStep(0);
 		},
-		
+
 		editStepTwo: function() {
 			this._handleNavigationToStep(1);
 		},
-		
+
 		/* =========================================================== */
 		/* event handlers (step 2)                                     */
 		/* =========================================================== */
@@ -163,30 +175,33 @@ sap.ui.define([
 		onStellenFinished: function(oEvent) {
 			var aItems = oEvent.getParameter("selectedItems");
 			var aStellen = [];
+			var oModel = this.getModel("newModel");
+			oModel.submitChanges();
+
 			for (var i = 0; i < aItems.length; i++) {
 				aStellen.push({
 					"Id": aItems[i].getKey(),
 					"Bezeichnung": aItems[i].getText()
 				});
 			}
-			
+
 			this.getModel("bewerberModel").setProperty("/Stellen", aStellen);
 		},
-		
+
 		onQuellenFinished: function(oEvent) {
 			var aItems = oEvent.getParameter("selectedItems");
 			var aQuellen = [];
-			
+
 			for (var i = 0; i < aItems.length; i++) {
 				aQuellen.push({
 					"Id": aItems[i].getKey(),
 					"Bezeichnung": aItems[i].getText()
 				});
 			}
-			
+
 			this.getModel("bewerberModel").setProperty("/Quellen", aQuellen);
 		},
-		
+
 		onStellenUpdateFinished: function(oEvent) {
 			var totalItems = oEvent.getParameter("total");
 			var oTable = this.getView().byId("tableStellen");
@@ -350,13 +365,13 @@ sap.ui.define([
 			oModel.setProperty("/Fotos", []);
 			this.getModel("wizardView").setProperty("/fotoVorhanden", false);
 		},
-		
+
 		onUploadComplete: function(oEvent) {
-			
+
 		},
-		
+
 		onUploadPress: function(oEvent) {
-			
+
 		}
 
 	});

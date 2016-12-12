@@ -1,5 +1,5 @@
 {
-	"_version": "1.1.0",
+	"_version": "1.4.0",
 	"sap.app": {
 		"_version": "1.1.0",
 		"id": "de.fis.applicationwizard",
@@ -15,6 +15,13 @@
 		"dataSources": {
 			"bewerbungservice": {
 				"uri": "https://trial.apim1.hanatrial.ondemand.com:443/p1942281469trial/v1/fis/bewerbungtest/"
+			},
+			"newService": {
+				"uri": "/applman/odata.srv/",
+				"type": "OData",
+				"settings": {
+					"odataVersion": "2.0"
+				}
 			}
 		}
 	},
@@ -67,6 +74,17 @@
 				"settings": {
 					"defaultBindingMode": "TwoWay"
 				}
+			},
+			"newModel": {
+				"dataSource": "newService",
+				"settings": {
+					"defaultOperationMode": "Server",
+					"defaultBindingMode": "TwoWay",
+					"defaultCountMode": "Inline",
+					"useBatch": false,
+					"json": true
+				},
+				"preload": true
 			}
 		},
 		"resources": {

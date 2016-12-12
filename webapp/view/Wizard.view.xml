@@ -7,37 +7,37 @@
 					<form:SimpleForm id="formBewerber" editable="true">
 						<core:Title text="{i18n>wizardPersonalData}"/>
 						<Label text="{i18n>wizardGender}"/>
-						<ComboBox selectedKey="{dataModel>Geschlecht}">
+						<ComboBox selectedKey="{newModel>Gender}">
 							<core:Item key="m" text="{i18n>wizardMale}"/>
 							<core:Item key="w" text="{i18n>wizardFemale}"/>
 						</ComboBox>
 						<Label text="{i18n>wizardSalutation}"/>
-						<Input value="{dataModel>Anrede}"/>
+						<Input value="{newModel>Salutation}"/>
 						<Label text="{i18n>wizardSurname}"/>
-						<Input value="{dataModel>Nachname}"/>
+						<Input value="{newModel>Lastname}"/>
 						<Label text="{i18n>wizardForename}"/>
-						<Input value="{dataModel>Vorname}"/>
+						<Input value="{newModel>Firstname}"/>
 						<Label text="{i18n>wizardBirthdate}"/>
-						<Input value="{dataModel>Geburtsdatum}"/>
+						<Input value="{newModel>Birthdate}"/>
 						<Label text="{i18n>wizardStreet}"/>
-						<Input value="{dataModel>StrasseHnr}"/>
+						<Input value="{newModel>Street}"/>
 						<Label text="{i18n>wizardZipCity}"/>
-						<Input value="{dataModel>Postleitzahl}"/>
-						<Input value="{dataModel>Ort}"/>
+						<Input value="{newModel>Zipcode}"/>
+						<Input value="{newModel>City}"/>
 						<core:Title text="{i18n>wizardContactData}"/>
 						<Label text="{i18n>wizardEmail}"/>
-						<Input value="{dataModel>Email}"/>
+						<Input value="{newModel>Email}"/>
 						<Label text="{i18n>wizardPhone}"/>
-						<Input value="{dataModel>Telefonnummer}"/>
+						<Input value="{newModel>Phone}"/>
 						<Label text="{i18n>wizardMobile}"/>
-						<Input value="{dataModel>Handynummer}"/>
+						<Input value="{newModel>Mobile}"/>
 					</form:SimpleForm>
 				</WizardStep>
 				<WizardStep validated="true" title="{i18n>wizardSteptitle2}" activate="additionalInfoValidation">
 					<form:SimpleForm editable="true">
 						<core:Title text="Stellen"/>
-						<MultiComboBox items="{path: 'dataModel>/Stelles', sorter: {path: 'Bezeichnung'}}" selectionFinish="onStellenFinished">
-							<core:Item key="{dataModel>StelleId}" text="{dataModel>Bezeichnung}"/>
+						<MultiComboBox items="{path: 'newModel>/Positions', sorter: {path: 'Name'}}" selectionFinish="onStellenFinished">
+							<core:Item key="{newModel>PositionId}" text="{newModel>Name}"/>
 						</MultiComboBox>
 						<core:Title text="Quellen"/>
 						<MultiComboBox items="{path: 'bewerberModel>/Quellen'}" selectionFinish="onQuellenFinished">
