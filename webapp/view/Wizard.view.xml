@@ -4,13 +4,15 @@
 		<Page id="wizardContentPage" title="Bewerbung anlegen">
 			<Wizard id="CreateApplicationWizard" finishButtonText="{i18n>wizardFinishButtonText}" complete="onWizardCompleted">
 				<WizardStep title="{i18n>wizardSteptitle1}" validated="true">
-					<form:SimpleForm id="formBewerber" editable="true">
+					<form:SimpleForm id="formBewerber" editable="true" layout="ResponsiveGridLayout">
 						<core:Title text="{i18n>wizardPersonalData}"/>
 						<Label text="{i18n>wizardGender}"/>
-						<ComboBox selectedKey="{newModel>Gender}">
-							<core:Item key="m" text="{i18n>wizardMale}"/>
-							<core:Item key="w" text="{i18n>wizardFemale}"/>
-						</ComboBox>
+						<SegmentedButton selectedKey="{newModel>Gender}">
+							<items>
+								<SegmentedButtonItem key="m" text="{i18n>wizardMale}"/>
+								<SegmentedButtonItem key="w" text="{i18n>wizardFemale}"/>
+							</items>
+						</SegmentedButton>
 						<Label text="{i18n>wizardSalutation}"/>
 						<Input value="{newModel>Salutation}"/>
 						<Label text="{i18n>wizardSurname}"/>
@@ -22,7 +24,11 @@
 						<Label text="{i18n>wizardStreet}"/>
 						<Input value="{newModel>Street}"/>
 						<Label text="{i18n>wizardZipCity}"/>
-						<Input value="{newModel>Zipcode}"/>
+						<Input value="{newModel>Zipcode}">
+							<layoutData>
+								<l:GridData span="L3 M3 S3"/>
+							</layoutData>
+						</Input>
 						<Input value="{newModel>City}"/>
 						<core:Title text="{i18n>wizardContactData}"/>
 						<Label text="{i18n>wizardEmail}"/>
