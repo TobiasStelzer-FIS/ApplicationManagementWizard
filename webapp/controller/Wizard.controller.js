@@ -61,7 +61,7 @@ sap.ui.define([
 					"EnteredOn": new Date()
 				},
 				"Applicant": {
-					"Gender": "w",
+					"Gender": "m",
 					"Salutation": "",
 					"Lastname": "",
 					"Firstname": "",
@@ -140,7 +140,7 @@ sap.ui.define([
 			});
 		},
 
-		_saveProgress() {
+		_saveProgress: function() {
 			var oModel = this.getModel("applmanModel");
 			this._saveApplicant(oModel);
 		},
