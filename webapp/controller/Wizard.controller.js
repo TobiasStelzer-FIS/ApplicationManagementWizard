@@ -56,23 +56,23 @@ sap.ui.define([
 			
 			var oDataModel = new JSONModel({
 				"Application": {
-					"ApplicantId": "",
+//					"ApplicantId": "",
 					"EnteredBy": "test",
 					"EnteredOn": new Date()
 				},
 				"Applicant": {
-					"Gender": "m",
-					"Salutation": "",
-					"Lastname": "",
-					"Firstname": "",
-					"Birthdate": new Date(),
-					"Picture": "",
-					"Street": "",
-					"Zipcode": "",
-					"City": "",
-					"Email": "",
-					"Phone": "",
-					"Mobile": ""
+					"Gender": "m"
+//					"Salutation": "",
+//					"Lastname": "",
+//					"Firstname": "",
+//					"Birthdate": new Date(),
+//					"Picture": "",
+//					"Street": "",
+//					"Zipcode": "",
+//					"City": "",
+//					"Email": "",
+//					"Phone": "",
+//					"Mobile": ""
 				},
 				"Positions": [],
 				"Sources": []
