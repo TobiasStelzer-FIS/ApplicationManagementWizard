@@ -15,12 +15,8 @@ sap.ui.define([
 		onInit: function() {
 			var oView = this.getView();
 
-			var oDataModel = this.getModel("newModel");
+			var oDataModel = this.getModel("applmanModel");
 			oDataModel.metadataLoaded().then(this._onMetadataLoaded.bind(this));
-
-			//			oDataModel.setProperty(oEntryBewerber.getPath() + "/Nachname", "Stelzer", {
-			//				bAsync: false
-			//			});
 
 			this._oWizard = oView.byId("CreateApplicationWizard");
 			this._oNavContainer = oView.byId("wizardNavContainer");
@@ -28,13 +24,12 @@ sap.ui.define([
 			this._oReviewPage = sap.ui.xmlfragment("de.fis.applicationwizard.view.fragment.ReviewPage", this);
 
 			this._oNavContainer.addPage(this._oReviewPage);
-
-			this._oApplicant = {};
-
+			
+			this._selectedService = "votes";
 			this._currentDialog = {};
-			this._dialogs = []; // this will store the instantiated dialogs 
-			//			this._getDialog("DialogStellen");
-
+			this._dialogs = []; // this will store the instantiated dialogs
+			// this._getDialog("DialogStellen");
+			
 			var oViewModel = new JSONModel({
 				"stellenTitle": this.getResourceBundle().getText("wizardStellenTitleWithCount", [0]),
 				"quellenTitle": this.getResourceBundle().getText("wizardQuellenTitleWithCount", [0]),
@@ -44,48 +39,50 @@ sap.ui.define([
 			});
 
 			this.setModel(oViewModel, "wizardView");
+			
+			this._initialize();
 		},
 
 		_onMetadataLoaded: function(oEvent) {
-			var oDataModel = this.getModel("newModel");
-			this._oApplicant = oDataModel.createEntry("Applicants", {
-				success: function(oData) {
-					console.log(oData);
-
-				}.bind(this)
-			});
-			oDataModel.setProperty(this._oApplicant.getPath() + "/Birthdate", "/Date(1481583600000)/");
-
-			var oModel = this.getModel("newModel");
-			var newApplicant = {
-				"Gender": "m",
-				"Salutation": "Herr",
-				"Firstname": "Tobias",
-				"Lastname": "Stelzer",
-				"Birthdate": "/Date(1481583600000)/",
-				"Street": "Goethestraße 56",
-				"Zipcode": "97493",
-				"City": "Bergrheinfeld",
-				"Email": "t.stelzer@fis-gmbh.de",
-				"Phone": "09713 1234712",
-				"Mobile": "18 23123 129837"
-			};
-
-			oModel.create("/Applicants", newApplicant, {
-				success: function(oData, response) {
-					var newApplication = {
-						"EnteredBy": "Maria Stürmer",
-						"EnteredOn": "/Date(1481583600000)/"
-					};
-					oModel.create("/Applicants('"+oData.ApplicantId+"')/Applications", newApplication);
-				}
-			});
-			var oForm = this.getView().byId("formBewerber");
-			oForm.setBindingContext(this._oApplicant, "newModel");
+			var oModel = this.getModel("applmanModel");
 		},
 
+		_initialize: function() {
+			var oMultiBoxPositions = this.getView().byId("multiComboBoxPositions");
+			var oMultiBoxSources = this.getView().byId("multiComboBoxSources");
+			
+			oMultiBoxPositions.clearSelection();
+			oMultiBoxSources.clearSelection();
+			
+			var oDataModel = new JSONModel({
+				"Application": {
+					"ApplicantId": "",
+					"EnteredBy": "test",
+					"EnteredOn": new Date()
+				},
+				"Applicant": {
+					"Gender": "w",
+					"Salutation": "",
+					"Lastname": "",
+					"Firstname": "",
+					"Birthdate": new Date(),
+					"Picture": "",
+					"Street": "",
+					"Zipcode": "",
+					"City": "",
+					"Email": "",
+					"Phone": "",
+					"Mobile": ""
+				},
+				"Positions": [],
+				"Sources": []
+			});
+			
+			this.setModel(oDataModel, "dataModel");
+		},
+		
 		/* =========================================================== */
-		/* internal methods		                                       */
+		/* internal methods */
 		/* =========================================================== */
 
 		_getDialog: function(sFragmentName) {
@@ -130,16 +127,83 @@ sap.ui.define([
 			MessageBox[sMessageBoxType](sMessage, {
 				actions: [MessageBox.Action.YES, MessageBox.Action.NO],
 				onClose: function(oAction) {
-					if (oAction === MessageBox.Action.YES) {
+					switch(oAction) {
+					case MessageBox.Action.YES:
+						that._initialize();
 						that._handleNavigationToStep(0);
 						that._oWizard.discardProgress(that._oWizard.getSteps()[0]);
+						break;
+					case MessageBox.Action.NO:
+						break;
 					}
 				}
 			});
 		},
 
+		_saveProgress() {
+			var oModel = this.getModel("applmanModel");
+			this._saveApplicant(oModel);
+		},
+		
+		_saveApplicant: function(oModel) {
+			// Create Applicant + receive applicantId
+			var oApplicant = this.getModel("dataModel").getProperty("/Applicant");
+			oModel.create("/Applicants", oApplicant, {
+				success: function(oData) {
+					this._saveApplication(oData.ApplicantId, oModel);
+					console.log(oData);
+				}.bind(this)
+			});
+		},
+		
+		_saveApplication: function(applicantId, oModel) {
+			// Create Application with applicantId + receive applicationId
+			this.getModel("dataModel").setProperty("/Application/ApplicantId", applicantId);
+			var oApplication = this.getModel("dataModel").getProperty("/Application");
+			oModel.create("/Applications", oApplication, {
+				success: function(oData) {
+					this._savePositions(oData.ApplicationId, oModel);
+					this._saveSources(oData.ApplicationId, oModel);
+					console.log(oData);
+				}.bind(this)
+			});			
+		},
+		
+		_savePositions: function(applicationId, oModel) {
+			var aPositions = this.getModel("dataModel").getProperty("/Positions");
+			// Create all LinkPositionApplication with applicationId
+			for (var i = 0; i < aPositions.length; i++) {
+				var oLinkPositionApplication = {
+					"PositionId": aPositions[i].PositionId,
+					"ApplicationId": applicationId
+				};
+				oModel.create("/LinkPositionApplications", oLinkPositionApplication, {
+					success: function(oData) {
+						console.log(oData);
+					}.bind(this)
+				});
+			}
+		},
+		
+		_saveSources: function(applicationId, oModel) {
+			var aSources = this.getModel("dataModel").getProperty("/Sources");
+			// Create all LinkSourceApplication with applicationId
+			for (var i = 0; i < aSources.length; i++) {
+				var oLinkSourceApplication = {
+					"SourceId": aSources[i].SourceId,
+					"ApplicationId": applicationId
+				};
+				oModel.create("/LinkSourceApplications", oLinkSourceApplication, {
+					success: function(oData) {
+						console.log(oData);
+					}.bind(this)
+				});
+			}
+			this._initialize();
+		},
+		
 		/* =========================================================== */
-		/* event handlers general                                      */
+		/* event handlers general */
 		/* =========================================================== */
 
 		onWizardCompleted: function() {
@@ -152,12 +216,13 @@ sap.ui.define([
 		},
 
 		onWizardSubmit: function() {
-			var sText = this.getResourceBundle().getText("wizardDialogSubmit");
-			this._handleMessageBoxOpen(sText, "confirm");
+			this._saveProgress();
+			this._handleNavigationToStep(0);
+			this._oWizard.discardProgress(this._oWizard.getSteps()[0]);
 		},
 
 		/* =========================================================== */
-		/* event handlers review page                                  */
+		/* event handlers review page */
 		/* =========================================================== */
 
 		editStepOne: function() {
@@ -169,46 +234,53 @@ sap.ui.define([
 		},
 
 		/* =========================================================== */
-		/* event handlers (step 2)                                     */
+		/* event handlers (step 2) */
 		/* =========================================================== */
 
-		onStellenFinished: function(oEvent) {
+		onPositionsFinished: function(oEvent) {
 			var aItems = oEvent.getParameter("selectedItems");
-			var aStellen = [];
-			var oModel = this.getModel("newModel");
-			oModel.submitChanges();
+			var aPositions = this.getModel("dataModel").getProperty("/Positions");
+			aPositions = [];
 
 			for (var i = 0; i < aItems.length; i++) {
-				aStellen.push({
-					"Id": aItems[i].getKey(),
-					"Bezeichnung": aItems[i].getText()
+				aPositions.push({
+					"PositionId": aItems[i].getKey(),
+					"Name": aItems[i].getText()
 				});
 			}
-
-			this.getModel("bewerberModel").setProperty("/Stellen", aStellen);
+			this.getModel("dataModel").setProperty("/Positions", aPositions);
 		},
 
-		onQuellenFinished: function(oEvent) {
+		onSourcesFinished: function(oEvent) {
 			var aItems = oEvent.getParameter("selectedItems");
-			var aQuellen = [];
-
+			var aSources = this.getModel("dataModel").getProperty("/Sources");
+			aSources = [];
+			
 			for (var i = 0; i < aItems.length; i++) {
-				aQuellen.push({
-					"Id": aItems[i].getKey(),
-					"Bezeichnung": aItems[i].getText()
+				aSources.push({
+					"SourceId": aItems[i].getKey(),
+					"Name": aItems[i].getText()
 				});
 			}
-
-			this.getModel("bewerberModel").setProperty("/Quellen", aQuellen);
+			this.getModel("dataModel").setProperty("/Sources", aSources);
 		},
 
 		onStellenUpdateFinished: function(oEvent) {
 			var totalItems = oEvent.getParameter("total");
 			var oTable = this.getView().byId("tableStellen");
 
-			if (oTable.getBinding("items").isLengthFinal()) { // Wenn die Länge der geladenen Items "final" ist, 
-				var sTitle = this.getResourceBundle().getText("wizardStellenTitleWithCount", [totalItems]); // aktualisiere die Itemanzahl
-				this.getModel("wizardView").setProperty("/stellenTitle", sTitle); // im Titel der Page
+			if (oTable.getBinding("items").isLengthFinal()) { // Wenn die
+																// Länge der
+																// geladenen
+																// Items "final"
+																// ist,
+				var sTitle = this.getResourceBundle().getText("wizardStellenTitleWithCount", [totalItems]); // aktualisiere
+																											// die
+																											// Itemanzahl
+				this.getModel("wizardView").setProperty("/stellenTitle", sTitle); // im
+																					// Titel
+																					// der
+																					// Page
 			}
 		},
 
@@ -216,24 +288,30 @@ sap.ui.define([
 			var totalItems = oEvent.getParameter("total");
 			var oTable = this.getView().byId("tableQuellen");
 
-			if (oTable.getBinding("items").isLengthFinal()) { // Wenn die Länge der geladenen Items "final" ist, 
-				var sTitle = this.getResourceBundle().getText("wizardQuellenTitleWithCount", [totalItems]); // aktualisiere die Itemanzahl
-				this.getModel("wizardView").setProperty("/quellenTitle", sTitle); // im Titel der Page
+			if (oTable.getBinding("items").isLengthFinal()) { // Wenn die
+																// Länge der
+																// geladenen
+																// Items "final"
+																// ist,
+				var sTitle = this.getResourceBundle().getText("wizardQuellenTitleWithCount", [totalItems]); // aktualisiere
+																											// die
+																											// Itemanzahl
+				this.getModel("wizardView").setProperty("/quellenTitle", sTitle); // im
+																					// Titel
+																					// der
+																					// Page
 			}
 		},
 
 		onAddStelle: function(oEvent) {
 			this._openDialog("DialogStellen");
 			/*
-			var oModel = this.getModel("bewerberModel");
-			var aStellen = oModel.getProperty("/Stellen");
-			var oStelle = {
-				"Bezeichnung": "Eine Stellenbezeichnung " + aStellen.length
-			};
-
-			aStellen.push(oStelle);
-			oModel.setProperty("/Stellen", aStellen);
-			*/
+			 * var oModel = this.getModel("bewerberModel"); var aStellen =
+			 * oModel.getProperty("/Stellen"); var oStelle = { "Bezeichnung":
+			 * "Eine Stellenbezeichnung " + aStellen.length };
+			 * 
+			 * aStellen.push(oStelle); oModel.setProperty("/Stellen", aStellen);
+			 */
 		},
 
 		onAddQuelle: function(oEvent) {
@@ -252,14 +330,21 @@ sap.ui.define([
 		 * 
 		 * @handler "search" event of SearchField
 		 * @handler "liveChange" event of SearchField
-		 * @param oEvent: The search or liveChange event
+		 * @param oEvent:
+		 *            The search or liveChange event
 		 * @public
 		 */
 		onStellenSearch: function(oEvent) {
 			var aFilters = [];
-			var sQuery = oEvent.getParameter("newValue"); // Parameter "newValue" enthält den Suchstring beim "liveChange"-Event
+			var sQuery = oEvent.getParameter("newValue"); // Parameter
+															// "newValue"
+															// enthält den
+															// Suchstring beim
+															// "liveChange"-Event
 			if (sQuery == null) {
-				sQuery = oEvent.getParameter("query"); // Falls es den nicht gibt, hole den vom "search"-Event
+				sQuery = oEvent.getParameter("query"); // Falls es den nicht
+														// gibt, hole den vom
+														// "search"-Event
 			}
 
 			if (sQuery !== "") { // Wenn etwas im SearchField steht,
@@ -273,6 +358,7 @@ sap.ui.define([
 		},
 
 		onDeleteStelle: function(oEvent) {
+			/*
 			var oModel = this.getModel("bewerberModel");
 			var oItem = oEvent.getParameter("listItem");
 			var oBindingContext = oItem.getBindingContext("bewerberModel");
@@ -282,9 +368,11 @@ sap.ui.define([
 
 			aStellen.splice(nIndex, 1);
 			oModel.setProperty("/Stellen", aStellen);
+			*/
 		},
 
 		onDeleteQuelle: function(oEvent) {
+			/*
 			var oModel = this.getModel("bewerberModel");
 			var oItem = oEvent.getParameter("listItem");
 			var oBindingContext = oItem.getBindingContext("bewerberModel");
@@ -294,19 +382,29 @@ sap.ui.define([
 
 			aQuellen.splice(nIndex, 1);
 			oModel.setProperty("/Quellen", aQuellen);
+			*/
 		},
 
 		/* =========================================================== */
-		/* event handlers (step 3)                                     */
+		/* event handlers (step 3) */
 		/* =========================================================== */
 
 		onDateienUpdateFinished: function(oEvent) {
 			var totalItems = oEvent.getParameter("total");
 			var oTable = this.getView().byId("tableDateien");
 
-			if (oTable.getBinding("items").isLengthFinal()) { // Wenn die Länge der geladenen Items "final" ist, 
-				var sTitle = this.getResourceBundle().getText("wizardDateienTitleWithCount", [totalItems]); // aktualisiere die Itemanzahl
-				this.getModel("wizardView").setProperty("/dateienTitle", sTitle); // im Titel der Page
+			if (oTable.getBinding("items").isLengthFinal()) { // Wenn die
+																// Länge der
+																// geladenen
+																// Items "final"
+																// ist,
+				var sTitle = this.getResourceBundle().getText("wizardDateienTitleWithCount", [totalItems]); // aktualisiere
+																											// die
+																											// Itemanzahl
+				this.getModel("wizardView").setProperty("/dateienTitle", sTitle); // im
+																					// Titel
+																					// der
+																					// Page
 			}
 		},
 
@@ -314,9 +412,18 @@ sap.ui.define([
 			var totalItems = oEvent.getParameter("total");
 			var oTable = this.getView().byId("tableFoto");
 
-			if (oTable.getBinding("items").isLengthFinal()) { // Wenn die Länge der geladenen Items "final" ist, 
-				var sTitle = this.getResourceBundle().getText("wizardFotoTitleWithCount", [totalItems]); // aktualisiere die Itemanzahl
-				this.getModel("wizardView").setProperty("/fotoTitle", sTitle); // im Titel der Page
+			if (oTable.getBinding("items").isLengthFinal()) { // Wenn die
+																// Länge der
+																// geladenen
+																// Items "final"
+																// ist,
+				var sTitle = this.getResourceBundle().getText("wizardFotoTitleWithCount", [totalItems]); // aktualisiere
+																											// die
+																											// Itemanzahl
+				this.getModel("wizardView").setProperty("/fotoTitle", sTitle); // im
+																				// Titel
+																				// der
+																				// Page
 			}
 		},
 
@@ -349,6 +456,7 @@ sap.ui.define([
 		},
 
 		onDeleteDatei: function(oEvent) {
+			/*
 			var oModel = this.getModel("bewerberModel");
 			var oItem = oEvent.getParameter("listItem");
 			var oBindingContext = oItem.getBindingContext("bewerberModel");
@@ -358,6 +466,7 @@ sap.ui.define([
 
 			aDateien.splice(nIndex, 1);
 			oModel.setProperty("/Dateien", aDateien);
+			*/
 		},
 
 		onDeleteFoto: function(oEvent) {

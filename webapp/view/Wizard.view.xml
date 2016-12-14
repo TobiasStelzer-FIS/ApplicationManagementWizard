@@ -7,47 +7,47 @@
 					<form:SimpleForm id="formBewerber" editable="true" layout="ResponsiveGridLayout">
 						<core:Title text="{i18n>wizardPersonalData}"/>
 						<Label text="{i18n>wizardGender}"/>
-						<SegmentedButton selectedKey="{newModel>Gender}">
+						<SegmentedButton selectedKey="{dataModel>/Applicant/Gender}">
 							<items>
 								<SegmentedButtonItem key="m" text="{i18n>wizardMale}"/>
 								<SegmentedButtonItem key="w" text="{i18n>wizardFemale}"/>
 							</items>
 						</SegmentedButton>
 						<Label text="{i18n>wizardSalutation}"/>
-						<Input value="{newModel>Salutation}"/>
+						<Input value="{dataModel>/Applicant/Salutation}"/>
 						<Label text="{i18n>wizardSurname}"/>
-						<Input value="{newModel>Lastname}"/>
+						<Input value="{dataModel>/Applicant/Lastname}"/>
 						<Label text="{i18n>wizardForename}"/>
-						<Input value="{newModel>Firstname}"/>
+						<Input value="{dataModel>/Applicant/Firstname}"/>
 						<Label text="{i18n>wizardBirthdate}"/>
-						<DatePicker value="{newModel>Birthdate}"/>
+						<DatePicker dateValue="{dataModel>/Applicant/Birthdate}"/>
 						<Label text="{i18n>wizardStreet}"/>
-						<Input value="{newModel>Street}"/>
+						<Input value="{dataModel>/Applicant/Street}"/>
 						<Label text="{i18n>wizardZipCity}"/>
-						<Input value="{newModel>Zipcode}">
+						<Input value="{dataModel>/Applicant/Zipcode}">
 							<layoutData>
-								<l:GridData span="L3 M3 S3"/>
+								<l:GridData span="L3 M12 S12"/>
 							</layoutData>
 						</Input>
-						<Input value="{newModel>City}"/>
+						<Input value="{dataModel>/Applicant/City}"/>
 						<core:Title text="{i18n>wizardContactData}"/>
 						<Label text="{i18n>wizardEmail}"/>
-						<Input value="{newModel>Email}"/>
+						<Input value="{dataModel>/Applicant/Email}"/>
 						<Label text="{i18n>wizardPhone}"/>
-						<Input value="{newModel>Phone}"/>
+						<Input value="{dataModel>/Applicant/Phone}"/>
 						<Label text="{i18n>wizardMobile}"/>
-						<Input value="{newModel>Mobile}"/>
+						<Input value="{dataModel>/Applicant/Mobile}"/>
 					</form:SimpleForm>
 				</WizardStep>
 				<WizardStep validated="true" title="{i18n>wizardSteptitle2}" activate="additionalInfoValidation">
 					<form:SimpleForm editable="true">
 						<core:Title text="Stellen"/>
-						<MultiComboBox items="{path: 'newModel>/Positions', sorter: {path: 'Name'}}" selectionFinish="onStellenFinished">
-							<core:Item key="{newModel>PositionId}" text="{newModel>Name}"/>
+						<MultiComboBox id="multiComboBoxPositions" items="{path: 'applmanModel>/Positions', sorter: {path: 'Name'}}" selectionFinish="onPositionsFinished">
+							<core:Item key="{applmanModel>PositionId}" text="{applmanModel>Name}"/>
 						</MultiComboBox>
 						<core:Title text="Quellen"/>
-						<MultiComboBox items="{path: 'bewerberModel>/Quellen'}" selectionFinish="onQuellenFinished">
-							<core:Item key="{bewerberModel>Id}" text="{bewerberModel>Bezeichnung}"/>
+						<MultiComboBox id="multiComboBoxSources" items="{path: 'applmanModel>/Sources'}" selectionFinish="onSourcesFinished">
+							<core:Item key="{applmanModel>SourceId}" text="{applmanModel>Name}"/>
 						</MultiComboBox>
 					</form:SimpleForm>
 					<!--

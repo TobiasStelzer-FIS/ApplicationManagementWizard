@@ -10,22 +10,22 @@
 						<core:Title text="{i18n>wizardPersonalData}"/>
 					</form:title>
 					<form:FormElement label="{i18n>wizardGender}">
-						<Text text="{bewerberModel>/Geschlecht}"/>
+						<Text text="{dataModel>/Applicant/Gender}"/>
 					</form:FormElement>
 					<form:FormElement label="{i18n>wizardSurname}">
-						<Text text="{bewerberModel>/Nachname}"/>
+						<Text text="{dataModel>/Applicant/Lastname}"/>
 					</form:FormElement>
 					<form:FormElement label="{i18n>wizardForename}">
-						<Text text="{bewerberModel>/Vorname}"/>
+						<Text text="{dataModel>/Applicant/Firstname}"/>
 					</form:FormElement>
 					<form:FormElement label="{i18n>wizardBirthdate}">
-						<Text text="{bewerberModel>/Geburtsdatum}"/>
+						<Text text="{dataModel>/Applicant/Birthdate}"/>
 					</form:FormElement>
 					<form:FormElement label="{i18n>wizardStreet}">
-						<Text text="{bewerberModel>/StrasseHnr}"/>
+						<Text text="{dataModel>/Applicant/Street}"/>
 					</form:FormElement>
 					<form:FormElement label="{i18n>wizardZipCity}">
-						<Text text="{bewerberModel>/Postleitzahl} {bewerberModel>/Ort}"/>
+						<Text text="{dataModel>/Applicant/Zipcode} {dataModel>/Applicant/City}"/>
 					</form:FormElement>
 				</form:FormContainer>
 				<form:FormContainer>
@@ -33,13 +33,13 @@
 						<core:Title text="{i18n>wizardContactData}"/>
 					</form:title>
 					<form:FormElement label="{i18n>wizardEmail}">
-						<Text text="{bewerberModel>/Email}"/>
+						<Text text="{dataModel>/Applicant/Email}"/>
 					</form:FormElement>
 					<form:FormElement label="{i18n>wizardPhone}">
-						<Text text="{bewerberModel>/Telefon}"/>
+						<Text text="{dataModel>/Applicant/Phone}"/>
 					</form:FormElement>
 					<form:FormElement label="{i18n>wizardMobile}">
-						<Text text="{bewerberModel>/Mobil}"/>
+						<Text text="{dataModel>/Applicant/Mobile}"/>
 						<Link press="editStepOne" text="Edit"/>
 					</form:FormElement>
 				</form:FormContainer>
@@ -48,16 +48,16 @@
 				<form:layout>
 					<form:ResponsiveGridLayout/>
 				</form:layout>
-				<form:FormContainer formElements="{path: 'bewerberModel>/Stellen'}" visible="{= ${bewerberModel>/Stellen}.length !== 0}">
+				<form:FormContainer formElements="{path: 'dataModel>/Positions'}" visible="{= ${dataModel>/Positions}.length !== 0}">
 					<form:title>
 						<core:Title text="Stellen"/>
 					</form:title>
 					<form:FormElement
-						label="{parts: [{path: 'bewerberModel>/Stellen'}, {path: 'bewerberModel>Id'}], formatter: '.formatter.formatLabelStellen'}">
-						<Text text="• {bewerberModel>Bezeichnung}"/>
+						label="{parts: [{path: 'dataModel>/Positions'}, {path: 'dataModel>PositionId'}], formatter: '.formatter.formatLabelStellen'}">
+						<Text text="• {dataModel>Name}"/>
 					</form:FormElement>
 				</form:FormContainer>
-				<form:FormContainer visible="{= ${bewerberModel>/Stellen}.length === 0}">
+				<form:FormContainer visible="{= ${dataModel>/Positions}.length === 0}">
 					<form:title>
 						<core:Title text="Stellen"/>
 					</form:title>
@@ -66,18 +66,18 @@
 						<Link press="editStepTwo" text="Edit" visible="false"/>
 					</form:FormElement>
 				</form:FormContainer>
-				<form:FormContainer formElements="{path: 'bewerberModel>/Quellen'}" visible="{= ${bewerberModel>/Quellen}.length !== 0}">
+				<form:FormContainer formElements="{path: 'dataModel>/Sources'}" visible="{= ${dataModel>/Sources}.length !== 0}">
 					<form:title>
 						<core:Title text="Quellen"/>
 					</form:title>
 					<form:FormElement
-						label="{parts: [{path: 'bewerberModel>/Quellen'}, {path: 'bewerberModel>Id'}], formatter: '.formatter.formatLabelQuellen'}">
-						<Text text="• {bewerberModel>Bezeichnung}"/>
+						label="{parts: [{path: 'dataModel>/Sources'}, {path: 'dataModel>SourceId'}], formatter: '.formatter.formatLabelQuellen'}">
+						<Text text="• {dataModel>Name}"/>
 						<Link press="editStepTwo" text="Edit"
-							visible="{parts: [{path: 'bewerberModel>/Quellen'}, {path: 'bewerberModel>Id'}], formatter: '.formatter.formatVisibleIfLast'}"/>
+							visible="{parts: [{path: 'dataModel>/Sources'}, {path: 'dataModel>SourceId'}], formatter: '.formatter.formatQuellenVisibleIfLast'}"/>
 					</form:FormElement>
 				</form:FormContainer>
-				<form:FormContainer visible="{= ${bewerberModel>/Quellen}.length === 0}">
+				<form:FormContainer visible="{= ${dataModel>/Sources}.length === 0}">
 					<form:title>
 						<core:Title text="Quellen"/>
 					</form:title>

@@ -23,14 +23,6 @@ sap.ui.define([
 			// set the device model
 			this.setModel(models.createDeviceModel(), "device");
 			
-			var sServiceUrl = this.getMetadata().getManifestEntry("sap.app").dataSources.bewerbungservice.uri;
-			var oBewerbungverwaltungModel = new sap.ui.model.odata.v2.ODataModel(sServiceUrl, {
-				json: true,
-				defaultBindingMode: "TwoWay",
-				loadMetadataAsync: true
-			});
-			this.setModel(oBewerbungverwaltungModel, "dataModel");			
-			
 			// initialize router
 			this.getRouter().initialize();
 		}

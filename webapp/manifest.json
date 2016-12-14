@@ -13,11 +13,8 @@
 		"resources": "resources.json",
 		"ach": "ach",
 		"dataSources": {
-			"bewerbungservice": {
-				"uri": "https://trial.apim1.hanatrial.ondemand.com:443/p1942281469trial/v1/fis/bewerbungtest/"
-			},
-			"newService": {
-				"uri": "/applman/odata.srv/",
+			"applmanService": {
+				"uri": "http://localhost:8541/applman/odata.srv/",
 				"type": "OData",
 				"settings": {
 					"odataVersion": "2.0"
@@ -41,7 +38,11 @@
 			"tablet": true,
 			"phone": true
 		},
-		"supportedThemes": ["sap_hcb", "sap_bluecrystal", "sap_belize"]
+		"supportedThemes": [
+			"sap_hcb",
+			"sap_bluecrystal",
+			"sap_belize"
+		]
 	},
 	"sap.ui5": {
 		"_version": "1.1.0",
@@ -52,9 +53,15 @@
 		"dependencies": {
 			"minUI5Version": "1.30.0",
 			"libs": {
-				"sap.ui.core": {},
-				"sap.m": {},
-				"sap.ui.layout": {}
+				"sap.ui.core": {
+					
+				},
+				"sap.m": {
+					
+				},
+				"sap.ui.layout": {
+					
+				}
 			}
 		},
 		"contentDensities": {
@@ -68,15 +75,8 @@
 					"bundleName": "de.fis.applicationwizard.i18n.i18n"
 				}
 			},
-			"dataModel": {
-				"dataSource": "bewerbungservice",
-				"type": "sap.ui.model.odata.v2.ODataModel",
-				"settings": {
-					"defaultBindingMode": "TwoWay"
-				}
-			},
-			"newModel": {
-				"dataSource": "newService",
+			"applmanModel": {
+				"dataSource": "applmanService",
 				"settings": {
 					"defaultOperationMode": "Server",
 					"defaultBindingMode": "TwoWay",
@@ -88,9 +88,9 @@
 			}
 		},
 		"resources": {
-			"css": [{
+			"css": {
 				"uri": "css/style.css"
-			}]
+			}
 		},
 		"routing": {
 			"config": {
