@@ -25,11 +25,6 @@ sap.ui.define([
 
 			this._oNavContainer.addPage(this._oReviewPage);
 			
-			this._selectedService = "votes";
-			this._currentDialog = {};
-			this._dialogs = []; // this will store the instantiated dialogs
-			// this._getDialog("DialogStellen");
-			
 			var oViewModel = new JSONModel({
 				"stellenTitle": this.getResourceBundle().getText("wizardStellenTitleWithCount", [0]),
 				"quellenTitle": this.getResourceBundle().getText("wizardQuellenTitleWithCount", [0]),
@@ -61,18 +56,18 @@ sap.ui.define([
 					"EnteredOn": new Date()
 				},
 				"Applicant": {
+					"Salutation": "Herr",
+					"Lastname": "Mustermann",
+					"Firstname": "Max",
+					"Birthdate": new Date(),
+					"Picture": "asdf",
+					"Street": "Himmelstraße 7",
+					"Zipcode": "98765",
+					"City": "Gottland",
+					"Email": "m.mustermann@gmail.com",
+					"Phone": "09876 12345",
+					"Mobile": "+49 153 54574559",
 					"Gender": "m"
-//					"Salutation": "",
-//					"Lastname": "",
-//					"Firstname": "",
-//					"Birthdate": new Date(),
-//					"Picture": "",
-//					"Street": "",
-//					"Zipcode": "",
-//					"City": "",
-//					"Email": "",
-//					"Phone": "",
-//					"Mobile": ""
 				},
 				"Positions": [],
 				"Sources": []
@@ -84,27 +79,6 @@ sap.ui.define([
 		/* =========================================================== */
 		/* internal methods */
 		/* =========================================================== */
-
-		_getDialog: function(sFragmentName) {
-			var oDialog = this._dialogs[sFragmentName];
-
-			if (!oDialog) {
-				oDialog = sap.ui.xmlfragment(this.getView().getId(), "de.fis.applicationwizard.view.fragment." + sFragmentName, this);
-				this.getView().addDependent(oDialog);
-				this._dialogs[sFragmentName] = oDialog;
-			}
-			return oDialog;
-		},
-
-		_openDialog: function(sFragmentName) {
-			this._currentDialog = this._getDialog(sFragmentName);
-			this._currentDialog.open();
-			return this._currentDialog;
-		},
-
-		_closeDialog: function() {
-			this._currentDialog.close();
-		},
 
 		_handleNavigationToStep: function(iStepNumber) {
 			var that = this;
@@ -142,62 +116,37 @@ sap.ui.define([
 
 		_saveProgress: function() {
 			var oModel = this.getModel("applmanModel");
-			this._saveApplicant(oModel);
-		},
-		
-		_saveApplicant: function(oModel) {
-			// Create Applicant + receive applicantId
-			var oApplicant = this.getModel("dataModel").getProperty("/Applicant");
-			oModel.create("/Applicants", oApplicant, {
-				success: function(oData) {
-					this._saveApplication(oData.ApplicantId, oModel);
-					console.log(oData);
-				}.bind(this)
-			});
-		},
-		
-		_saveApplication: function(applicantId, oModel) {
-			// Create Application with applicantId + receive applicationId
-			this.getModel("dataModel").setProperty("/Application/ApplicantId", applicantId);
-			var oApplication = this.getModel("dataModel").getProperty("/Application");
+			var oDataModel = this.getModel("dataModel");
+			var oApplication = oDataModel.getProperty("/Application");
+			oApplication.ApplicantDetails = oDataModel.getProperty("/Applicant");
 			oModel.create("/Applications", oApplication, {
 				success: function(oData) {
 					this._savePositions(oData.ApplicationId, oModel);
 					this._saveSources(oData.ApplicationId, oModel);
 					console.log(oData);
 				}.bind(this)
-			});			
+			});
 		},
 		
 		_savePositions: function(applicationId, oModel) {
 			var aPositions = this.getModel("dataModel").getProperty("/Positions");
-			// Create all LinkPositionApplication with applicationId
+			// Link the Application with all Positions
 			for (var i = 0; i < aPositions.length; i++) {
-				var oLinkPositionApplication = {
-					"PositionId": aPositions[i].PositionId,
-					"ApplicationId": applicationId
+				var oLink = {
+					"uri": "http://localhost:8541/applman/odata.srv/Positions('"+aPositions[i].PositionId+"')"
 				};
-				oModel.create("/LinkPositionApplications", oLinkPositionApplication, {
-					success: function(oData) {
-						console.log(oData);
-					}.bind(this)
-				});
+				oModel.create("/Applications('" + applicationId + "')/$links/Positions", oLink);
 			}
 		},
 		
 		_saveSources: function(applicationId, oModel) {
 			var aSources = this.getModel("dataModel").getProperty("/Sources");
-			// Create all LinkSourceApplication with applicationId
+			// Link the Application with all Sources
 			for (var i = 0; i < aSources.length; i++) {
-				var oLinkSourceApplication = {
-					"SourceId": aSources[i].SourceId,
-					"ApplicationId": applicationId
+				var oLink = {
+					"uri": "http://localhost:8541/applman/odata.srv/Sources('"+aSources[i].SourceId+"')"
 				};
-				oModel.create("/LinkSourceApplications", oLinkSourceApplication, {
-					success: function(oData) {
-						console.log(oData);
-					}.bind(this)
-				});
+				oModel.create("/Applications('" + applicationId + "')/$links/Sources", oLink);
 			}
 			this._initialize();
 		},
@@ -265,126 +214,6 @@ sap.ui.define([
 			this.getModel("dataModel").setProperty("/Sources", aSources);
 		},
 
-		onStellenUpdateFinished: function(oEvent) {
-			var totalItems = oEvent.getParameter("total");
-			var oTable = this.getView().byId("tableStellen");
-
-			if (oTable.getBinding("items").isLengthFinal()) { // Wenn die
-																// Länge der
-																// geladenen
-																// Items "final"
-																// ist,
-				var sTitle = this.getResourceBundle().getText("wizardStellenTitleWithCount", [totalItems]); // aktualisiere
-																											// die
-																											// Itemanzahl
-				this.getModel("wizardView").setProperty("/stellenTitle", sTitle); // im
-																					// Titel
-																					// der
-																					// Page
-			}
-		},
-
-		onQuellenUpdateFinished: function(oEvent) {
-			var totalItems = oEvent.getParameter("total");
-			var oTable = this.getView().byId("tableQuellen");
-
-			if (oTable.getBinding("items").isLengthFinal()) { // Wenn die
-																// Länge der
-																// geladenen
-																// Items "final"
-																// ist,
-				var sTitle = this.getResourceBundle().getText("wizardQuellenTitleWithCount", [totalItems]); // aktualisiere
-																											// die
-																											// Itemanzahl
-				this.getModel("wizardView").setProperty("/quellenTitle", sTitle); // im
-																					// Titel
-																					// der
-																					// Page
-			}
-		},
-
-		onAddStelle: function(oEvent) {
-			this._openDialog("DialogStellen");
-			/*
-			 * var oModel = this.getModel("bewerberModel"); var aStellen =
-			 * oModel.getProperty("/Stellen"); var oStelle = { "Bezeichnung":
-			 * "Eine Stellenbezeichnung " + aStellen.length };
-			 * 
-			 * aStellen.push(oStelle); oModel.setProperty("/Stellen", aStellen);
-			 */
-		},
-
-		onAddQuelle: function(oEvent) {
-			var oModel = this.getModel("bewerberModel");
-			var aQuellen = oModel.getProperty("/Quellen");
-			var oQuelle = {
-				"Bezeichnung": "Eine Quellenbezeichnung" + aQuellen.length
-			};
-
-			aQuellen.push(oQuelle);
-			oModel.setProperty("/Quellen", aQuellen);
-		},
-
-		/**
-		 * Determines the search query string and creates a corresponding filter
-		 * 
-		 * @handler "search" event of SearchField
-		 * @handler "liveChange" event of SearchField
-		 * @param oEvent:
-		 *            The search or liveChange event
-		 * @public
-		 */
-		onStellenSearch: function(oEvent) {
-			var aFilters = [];
-			var sQuery = oEvent.getParameter("newValue"); // Parameter
-															// "newValue"
-															// enthält den
-															// Suchstring beim
-															// "liveChange"-Event
-			if (sQuery == null) {
-				sQuery = oEvent.getParameter("query"); // Falls es den nicht
-														// gibt, hole den vom
-														// "search"-Event
-			}
-
-			if (sQuery !== "") { // Wenn etwas im SearchField steht,
-				aFilters.push( // dann erstelle Filter für Bezeichnung
-					new Filter("Bezeichnung", FilterOperator.Contains, sQuery)
-				);
-			}
-
-			var oList = this.getView().byId("listSelectStellen");
-			oList.getBinding("items").filter(aFilters, "Application");
-		},
-
-		onDeleteStelle: function(oEvent) {
-			/*
-			var oModel = this.getModel("bewerberModel");
-			var oItem = oEvent.getParameter("listItem");
-			var oBindingContext = oItem.getBindingContext("bewerberModel");
-			var sPath = oBindingContext.getPath();
-			var nIndex = parseInt(sPath.substring(sPath.length - 1, sPath.length));
-			var aStellen = oModel.getProperty("/Stellen");
-
-			aStellen.splice(nIndex, 1);
-			oModel.setProperty("/Stellen", aStellen);
-			*/
-		},
-
-		onDeleteQuelle: function(oEvent) {
-			/*
-			var oModel = this.getModel("bewerberModel");
-			var oItem = oEvent.getParameter("listItem");
-			var oBindingContext = oItem.getBindingContext("bewerberModel");
-			var sPath = oBindingContext.getPath();
-			var nIndex = parseInt(sPath.substring(sPath.length - 1, sPath.length));
-			var aQuellen = oModel.getProperty("/Quellen");
-
-			aQuellen.splice(nIndex, 1);
-			oModel.setProperty("/Quellen", aQuellen);
-			*/
-		},
-
 		/* =========================================================== */
 		/* event handlers (step 3) */
 		/* =========================================================== */
@@ -408,25 +237,6 @@ sap.ui.define([
 			}
 		},
 
-		onFotoUpdateFinished: function(oEvent) {
-			var totalItems = oEvent.getParameter("total");
-			var oTable = this.getView().byId("tableFoto");
-
-			if (oTable.getBinding("items").isLengthFinal()) { // Wenn die
-																// Länge der
-																// geladenen
-																// Items "final"
-																// ist,
-				var sTitle = this.getResourceBundle().getText("wizardFotoTitleWithCount", [totalItems]); // aktualisiere
-																											// die
-																											// Itemanzahl
-				this.getModel("wizardView").setProperty("/fotoTitle", sTitle); // im
-																				// Titel
-																				// der
-																				// Page
-			}
-		},
-
 		onAddDatei: function(oEvent) {
 			var oModel = this.getModel("bewerberModel");
 			var aDateien = oModel.getProperty("/Dateien");
@@ -437,22 +247,6 @@ sap.ui.define([
 
 			aDateien.push(oDatei);
 			oModel.setProperty("/Dateien", aDateien);
-		},
-
-		onAddFoto: function(oEvent) {
-			var oModel = this.getModel("bewerberModel");
-			if (oModel.getProperty("/Fotos").length > 0) {
-				sap.m.MessageToast.show("Es kann nur ein Foto hochgeladen werden.");
-				return;
-			}
-			var aFotos = [];
-			var oFoto = {
-				"Dateiname": "max_mustermann.png"
-			};
-
-			aFotos.push(oFoto);
-			oModel.setProperty("/Fotos", aFotos);
-			this.getModel("wizardView").setProperty("/fotoVorhanden", true);
 		},
 
 		onDeleteDatei: function(oEvent) {
