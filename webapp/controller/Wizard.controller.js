@@ -38,6 +38,11 @@ sap.ui.define([
 			var oModel = this.getModel("applmanModel");
 		},
 
+		/**
+		 * Resets the dataModel of the View
+		 * 
+		 * @private
+		 */
 		_initialize: function() {
 			var oMultiBoxPositions = this.getView().byId("multiComboBoxPositions");
 			var oMultiBoxSources = this.getView().byId("multiComboBoxSources");
@@ -47,7 +52,6 @@ sap.ui.define([
 			
 			var oDataModel = new JSONModel({
 				"Application": {
-//					"ApplicantId": "",
 					"EnteredBy": "test",
 					"EnteredOn": new Date()
 				},
@@ -75,7 +79,12 @@ sap.ui.define([
 		/* =========================================================== */
 		/* internal methods */
 		/* =========================================================== */
-
+		/**
+		 * Navigates to a specified step on the Wizard Page
+		 * 
+		 * @param iStepNumber: The number of the step to navigate to
+		 * @private
+		 */
 		_handleNavigationToStep: function(iStepNumber) {
 			var that = this;
 
@@ -87,11 +96,24 @@ sap.ui.define([
 			this._oNavContainer.attachAfterNavigate(fnAfterNavigate);
 			this._backToWizardContent();
 		},
-
+		
+		/**
+		 * Navigates to the Wizard Page
+		 * 
+		 * @private
+		 */
 		_backToWizardContent: function() {
 			this._oNavContainer.backToPage(this._oWizardContentPage.getId());
 		},
-
+		
+		/**
+		 * Opens a MessageBox which let's you decide if you 
+		 * really want to cancel the Entry
+		 * 
+		 * @param sMessage: The Messages text
+		 * @param sMessageBoxType: The type of the MessageBox (e.g. "warning")
+		 * @private
+		 */
 		_handleMessageBoxOpen: function(sMessage, sMessageBoxType) {
 			var that = this;
 			MessageBox[sMessageBoxType](sMessage, {
@@ -109,7 +131,14 @@ sap.ui.define([
 				}
 			});
 		},
-
+		
+		/**
+		 * Sends the create-request with the Application data 
+		 * to the service. If that was successful it also calls:
+		 * 		_saveProgress() and _savePositions()
+		 * 
+		 * @private
+		 */
 		_saveProgress: function() {
 			var oModel = this.getModel("applmanModel");
 			var oDataModel = this.getModel("dataModel");
@@ -124,6 +153,14 @@ sap.ui.define([
 			});
 		},
 		
+		/**
+		 * Sends create-request to the service for establishing
+		 * the links between Position and Application
+		 * 
+		 * @param applicationId: The Id of a previously created application
+		 * @param oModel: The ODataModel to send the request to
+		 * @private
+		 */
 		_savePositions: function(applicationId, oModel) {
 			var aPositions = this.getModel("dataModel").getProperty("/Positions");
 			// Link the Application with all Positions
@@ -135,6 +172,14 @@ sap.ui.define([
 			}
 		},
 		
+		/**
+		 * Sends create-request to the service for establishing
+		 * the links between Source and Application
+		 * 
+		 * @param applicationId: The Id of a previously created application
+		 * @param oModel: The ODataModel to send the request to
+		 * @private
+		 */
 		_saveSources: function(applicationId, oModel) {
 			var aSources = this.getModel("dataModel").getProperty("/Sources");
 			// Link the Application with all Sources
@@ -151,15 +196,32 @@ sap.ui.define([
 		/* event handlers general */
 		/* =========================================================== */
 
+		/**
+		 * Navigates to the ReviewPage
+		 * 
+		 * @handler "complete" event of the Wizard
+		 * @public
+		 */
 		onWizardCompleted: function() {
 			this._oNavContainer.to(this._oReviewPage);
 		},
-
+		/**
+		 * Opens a MessageBox to let the user confirm 
+		 * that she wants to cancel the entry
+		 * 
+		 * @handler "press" event of the cancel-Button (ReviewPage)
+		 * @public
+		 */
 		onWizardCancel: function() {
 			var sText = this.getResourceBundle().getText("DialogCancel");
 			this._handleMessageBoxOpen(sText, "warning");
 		},
-
+		/**
+		 * Calls functions to save the Entry and reset the Wizard
+		 * 
+		 * @handler "press" event of the submit-Button (ReviewPage)
+		 * @public
+		 */
 		onWizardSubmit: function() {
 			this._saveProgress();
 			this._handleNavigationToStep(0);
@@ -169,11 +231,22 @@ sap.ui.define([
 		/* =========================================================== */
 		/* event handlers review page */
 		/* =========================================================== */
-
+		/**
+		 * Navigates back to the first Step of the Wizard
+		 * 
+		 * @handler "press" event of the edit-Link in the first section (ReviewPage)
+		 * @public
+		 */
 		editStepOne: function() {
 			this._handleNavigationToStep(0);
 		},
-
+		
+		/**
+		 * Navigates back to the second Step of the Wizard
+		 * 
+		 * @handler "press" event of the edit-Link in the second section (ReviewPage)
+		 * @public
+		 */
 		editStepTwo: function() {
 			this._handleNavigationToStep(1);
 		},
@@ -181,8 +254,14 @@ sap.ui.define([
 		/* =========================================================== */
 		/* event handlers (step 2) */
 		/* =========================================================== */
-
-		onPositionsFinished: function(oEvent) {
+		/**
+		 * Stores the selected Positions (Id and Name) in the dataModel of the View
+		 * (for later use)
+		 * 
+		 * @handler "selectionFinish" event of the MultiComboBox for Positions
+		 * @public
+		 */
+		onPositionsFinished: function() {
 			var aItems = oEvent.getParameter("selectedItems");
 			var aPositions = this.getModel("dataModel").getProperty("/Positions");
 			aPositions = [];
@@ -195,7 +274,13 @@ sap.ui.define([
 			}
 			this.getModel("dataModel").setProperty("/Positions", aPositions);
 		},
-
+		/**
+		 * Stores the selected Sources (Id and Name) in the dataModel of the View
+		 * (for later use)
+		 * 
+		 * @handler "selectionFinish" event of the MultiComboBox for Sources
+		 * @public
+		 */
 		onSourcesFinished: function(oEvent) {
 			var aItems = oEvent.getParameter("selectedItems");
 			var aSources = this.getModel("dataModel").getProperty("/Sources");
@@ -213,38 +298,47 @@ sap.ui.define([
 		/* =========================================================== */
 		/* event handlers (step 3) */
 		/* =========================================================== */
-
+		/**
+		 * Changes the Title of the Table to include its amount of items
+		 * 
+		 * @handler "updateFinished" event of the File-Table
+		 * @param oEvent: The updateFinished event
+		 * @public
+		 */
 		onDateienUpdateFinished: function(oEvent) {
-			var totalItems = oEvent.getParameter("total");
-			var oTable = this.getView().byId("tableDateien");
-
-			if (oTable.getBinding("items").isLengthFinal()) { // Wenn die
-																// Länge der
-																// geladenen
-																// Items "final"
-																// ist,
-				var sTitle = this.getResourceBundle().getText("wizardDateienTitleWithCount", [totalItems]); // aktualisiere
-																											// die
-																											// Itemanzahl
-				this.getModel("wizardView").setProperty("/dateienTitle", sTitle); // im
-																					// Titel
-																					// der
-																					// Page
-			}
+//			var totalItems = oEvent.getParameter("total");
+//			var oTable = this.getView().byId("tableDateien");
+//
+//			if (oTable.getBinding("items").isLengthFinal()) { 
+//				var sTitle = this.getResourceBundle().getText("wizardDateienTitleWithCount", [totalItems]); 
+//				this.getModel("wizardView").setProperty("/dateienTitle", sTitle); 
+//			}
 		},
-
+		/**
+		 * Handles the process of adding a new file
+		 * 
+		 * @handler "press" event of the add-Button in the File-Table Toolbar
+		 * @param oEvent: The press event
+		 * @public
+		 */
 		onAddDatei: function(oEvent) {
-			var oModel = this.getModel("bewerberModel");
-			var aDateien = oModel.getProperty("/Dateien");
-			var oDatei = {
-				"Anzeigetext": "Eine Datei " + aDateien.length,
-				"Dateiname": "Datei/in/einem/Ordner.pdf"
-			};
-
-			aDateien.push(oDatei);
-			oModel.setProperty("/Dateien", aDateien);
+//			var oModel = this.getModel("bewerberModel");
+//			var aDateien = oModel.getProperty("/Dateien");
+//			var oDatei = {
+//				"Anzeigetext": "Eine Datei " + aDateien.length,
+//				"Dateiname": "Datei/in/einem/Ordner.pdf"
+//			};
+//
+//			aDateien.push(oDatei);
+//			oModel.setProperty("/Dateien", aDateien);
 		},
-
+		/**
+		 * Handles the process of deleting a new file
+		 * 
+		 * @handler "delete" event of the File-Table
+		 * @param oEvent: The delete event
+		 * @public
+		 */
 		onDeleteDatei: function(oEvent) {
 			/*
 			var oModel = this.getModel("bewerberModel");
@@ -257,12 +351,6 @@ sap.ui.define([
 			aDateien.splice(nIndex, 1);
 			oModel.setProperty("/Dateien", aDateien);
 			*/
-		},
-
-		onDeleteFoto: function(oEvent) {
-			var oModel = this.getModel("bewerberModel");
-			oModel.setProperty("/Fotos", []);
-			this.getModel("wizardView").setProperty("/fotoVorhanden", false);
 		},
 
 		onUploadComplete: function(oEvent) {
