@@ -3,6 +3,16 @@ sap.ui.define(function() {
 
 	return {
 
+		genderKeyToName: function(key) {
+			var oBundle = this.getModel("i18n").getResourceBundle();
+			switch(key) {
+			case "w":
+				return oBundle.getText("Female");
+			case "m":
+				return oBundle.getText("Male");
+			}
+		},
+		
 		formatQuellenVisibleIfLast: function(aItems, nCurrentId) {
 			if (aItems[aItems.length - 1].SourceId === nCurrentId) {
 				return true;
@@ -11,17 +21,19 @@ sap.ui.define(function() {
 		},
 
 		formatLabelStellen: function(aItems, nCurrentId) {
+			var oBundle = this.getModel("i18n").getResourceBundle();
 			if (aItems[0].PositionId === nCurrentId) {
-				return "Stellen";
+				return oBundle.getText("Positions");
 			}
-			return " ";
+			return "";
 		},
 
 		formatLabelQuellen: function(aItems, nCurrentId) {
+			var oBundle = this.getModel("i18n").getResourceBundle();
 			if (aItems[0].SourceId === nCurrentId) {
-				return "Quellen";
+				return oBundle.getText("Sources");
 			}
-			return " ";
+			return "";
 		}
 
 	};

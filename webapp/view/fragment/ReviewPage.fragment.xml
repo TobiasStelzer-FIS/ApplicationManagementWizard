@@ -1,88 +1,107 @@
 <core:FragmentDefinition height="100%" xmlns:layout="sap.ui.layout" xmlns:form="sap.ui.layout.form" xmlns:core="sap.ui.core" xmlns="sap.m">
-	<Page id="wizardReviewPage" title="Bewerbung überpüfen">
+	<Page id="wizardReviewPage" title="{i18n>ReviewPageTitle}">
 		<content>
-			<form:Form title="{i18n>wizardSteptitle1}" minWidth="1024" editable="false">
+			<form:Form title="{i18n>Steptitle1}" minWidth="1024" editable="false">
 				<form:layout>
 					<form:ResponsiveGridLayout/>
 				</form:layout>
+				
+				<!-- Personal Data -->
 				<form:FormContainer>
 					<form:title>
-						<core:Title text="{i18n>wizardPersonalData}"/>
+						<core:Title text="{i18n>PersonalData}"/>
 					</form:title>
-					<form:FormElement label="{i18n>wizardGender}">
-						<Text text="{dataModel>/Applicant/Gender}"/>
+					<form:FormElement label="{i18n>Gender}">
+						<Text text="{dataModel>/Applicant/Gender}, formatter: '.formatter.genderKeyToName'"/>
 					</form:FormElement>
-					<form:FormElement label="{i18n>wizardSurname}">
+					<form:FormElement label="{i18n>Lastname}">
 						<Text text="{dataModel>/Applicant/Lastname}"/>
 					</form:FormElement>
-					<form:FormElement label="{i18n>wizardForename}">
+					<form:FormElement label="{i18n>Firstname}">
 						<Text text="{dataModel>/Applicant/Firstname}"/>
 					</form:FormElement>
-					<form:FormElement label="{i18n>wizardBirthdate}">
+					<form:FormElement label="{i18n>Birthdate}">
 						<Text text="{dataModel>/Applicant/Birthdate}"/>
 					</form:FormElement>
-					<form:FormElement label="{i18n>wizardStreet}">
+					<form:FormElement label="{i18n>Street}">
 						<Text text="{dataModel>/Applicant/Street}"/>
 					</form:FormElement>
-					<form:FormElement label="{i18n>wizardZipCity}">
+					<form:FormElement label="{i18n>ZipCity}">
 						<Text text="{dataModel>/Applicant/Zipcode} {dataModel>/Applicant/City}"/>
 					</form:FormElement>
 				</form:FormContainer>
+				
+				<!-- Contact Data -->
 				<form:FormContainer>
 					<form:title>
-						<core:Title text="{i18n>wizardContactData}"/>
+						<core:Title text="{i18n>ContactData}"/>
 					</form:title>
-					<form:FormElement label="{i18n>wizardEmail}">
+					<form:FormElement label="{i18n>Email}">
 						<Text text="{dataModel>/Applicant/Email}"/>
 					</form:FormElement>
-					<form:FormElement label="{i18n>wizardPhone}">
+					<form:FormElement label="{i18n>Phone}">
 						<Text text="{dataModel>/Applicant/Phone}"/>
 					</form:FormElement>
-					<form:FormElement label="{i18n>wizardMobile}">
+					<form:FormElement label="{i18n>Mobile}">
 						<Text text="{dataModel>/Applicant/Mobile}"/>
-						<Link press="editStepOne" text="Edit"/>
+					</form:FormElement>
+					<form:FormElement label="">
+						<Text text=""/>
+						<Link press="editStepOne" text="{i18n>EditButton}"/>
 					</form:FormElement>
 				</form:FormContainer>
 			</form:Form>
-			<form:Form title="{i18n>wizardSteptitle2}" editable="false">
+			
+			<!-- Positions and Sources -->
+			<form:Form title="{i18n>Steptitle2}" editable="false">
 				<form:layout>
 					<form:ResponsiveGridLayout/>
 				</form:layout>
+				
+				<!-- Shows only if there are Positions selected -->
 				<form:FormContainer formElements="{path: 'dataModel>/Positions'}" visible="{= ${dataModel>/Positions}.length !== 0}">
 					<form:title>
-						<core:Title text="Stellen"/>
+						<core:Title text="{i18n>Positions}"/>
 					</form:title>
 					<form:FormElement
 						label="{parts: [{path: 'dataModel>/Positions'}, {path: 'dataModel>PositionId'}], formatter: '.formatter.formatLabelStellen'}">
 						<Text text="• {dataModel>Name}"/>
 					</form:FormElement>
 				</form:FormContainer>
+				
+				<!-- Shows only if there are NO Positions selected -->
 				<form:FormContainer visible="{= ${dataModel>/Positions}.length === 0}">
 					<form:title>
-						<core:Title text="Stellen"/>
+						<core:Title text="{i18n>Positions}"/>
 					</form:title>
-					<form:FormElement label="Stellen">
-						<Text text="Keine Stellen (Initiativbewerbung)"/>
-						<Link press="editStepTwo" text="Edit" visible="false"/>
+					<form:FormElement label="{i18n>Positions}">
+						<Text text="{i18n>NoDataTextPositions}"/>
 					</form:FormElement>
 				</form:FormContainer>
+				
+				<!-- Shows only if there are Sources selected -->
 				<form:FormContainer formElements="{path: 'dataModel>/Sources'}" visible="{= ${dataModel>/Sources}.length !== 0}">
 					<form:title>
-						<core:Title text="Quellen"/>
+						<core:Title text="{i18n>Sources}"/>
 					</form:title>
 					<form:FormElement
 						label="{parts: [{path: 'dataModel>/Sources'}, {path: 'dataModel>SourceId'}], formatter: '.formatter.formatLabelQuellen'}">
 						<Text text="• {dataModel>Name}"/>
-						<Link press="editStepTwo" text="Edit"
+						<Link press="editStepTwo" text="{i18n>EditButton}"
 							visible="{parts: [{path: 'dataModel>/Sources'}, {path: 'dataModel>SourceId'}], formatter: '.formatter.formatQuellenVisibleIfLast'}"/>
 					</form:FormElement>
 				</form:FormContainer>
+				
+				<!-- Shows only if there are NO Sources selected -->
 				<form:FormContainer visible="{= ${dataModel>/Sources}.length === 0}">
 					<form:title>
-						<core:Title text="Quellen"/>
+						<core:Title text="{i18n>Sources}"/>
 					</form:title>
-					<form:FormElement label="Quellen">
-						<Text text="Keine Quellen"/>
+					<form:FormElement label="{i18n>Sources}">
+						<Text text="{i18n>NoDataTextSources}"/>
+					</form:FormElement>
+					<form:FormElement label="">
+						<Text text=""/>
 						<Link press="editStepTwo" text="Edit"/>
 					</form:FormElement>
 				</form:FormContainer>
@@ -91,8 +110,8 @@
 		<footer>
 			<Bar>
 				<contentRight>
-					<Button text="Submit" press="onWizardSubmit"></Button>
-					<Button text="Cancel" press="onWizardCancel"></Button>
+					<Button text="{i18n>SubmitButton}" press="onWizardSubmit"></Button>
+					<Button text="{i18n>CancelButton}" press="onWizardCancel"></Button>
 				</contentRight>
 			</Bar>
 		</footer>

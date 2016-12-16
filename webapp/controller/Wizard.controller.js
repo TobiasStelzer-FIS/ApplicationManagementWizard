@@ -26,11 +26,7 @@ sap.ui.define([
 			this._oNavContainer.addPage(this._oReviewPage);
 			
 			var oViewModel = new JSONModel({
-				"stellenTitle": this.getResourceBundle().getText("wizardStellenTitleWithCount", [0]),
-				"quellenTitle": this.getResourceBundle().getText("wizardQuellenTitleWithCount", [0]),
-				"dateienTitle": this.getResourceBundle().getText("wizardDateienTitleWithCount", [0]),
-				"fotoTitle": this.getResourceBundle().getText("wizardFotoTitleWithCount", [0]),
-				"fotoVorhanden": false
+				"dateienTitle": this.getResourceBundle().getText("DateienTitleWithCount", [0])
 			});
 
 			this.setModel(oViewModel, "wizardView");
@@ -160,7 +156,7 @@ sap.ui.define([
 		},
 
 		onWizardCancel: function() {
-			var sText = this.getResourceBundle().getText("wizardDialogCancel");
+			var sText = this.getResourceBundle().getText("DialogCancel");
 			this._handleMessageBoxOpen(sText, "warning");
 		},
 
