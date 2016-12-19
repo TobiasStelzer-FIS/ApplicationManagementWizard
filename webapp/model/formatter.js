@@ -11,6 +11,7 @@ sap.ui.define(function() {
 			case "m":
 				return oBundle.getText("Male");
 			}
+			return "";
 		},
 		
 		formatQuellenVisibleIfLast: function(aItems, nCurrentId) {

@@ -12,7 +12,7 @@
 						<core:Title text="{i18n>PersonalData}"/>
 					</form:title>
 					<form:FormElement label="{i18n>Gender}">
-						<Text text="{dataModel>/Applicant/Gender}, formatter: '.formatter.genderKeyToName'"/>
+						<Text text="{path: 'dataModel>/Applicant/Gender', formatter: '.formatter.genderKeyToName'}"/>
 					</form:FormElement>
 					<form:FormElement label="{i18n>Lastname}">
 						<Text text="{dataModel>/Applicant/Lastname}"/>
