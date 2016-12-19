@@ -102,7 +102,7 @@
 					</form:FormElement>
 					<form:FormElement label="">
 						<Text text=""/>
-						<Link press="editStepTwo" text="Edit"/>
+						<Link press="editStepTwo" text="{i18n>EditButton}"/>
 					</form:FormElement>
 				</form:FormContainer>
 			</form:Form>
