@@ -51,16 +51,18 @@
 				<WizardStep validated="true" title="{i18n>Steptitle2}"
 					activate="additionalInfoValidation">
 					<form:SimpleForm editable="true">
-						<core:Title text="{i18n>Positions}" />
+						<core:Title text="{i18n>Positions}"/>
+						<Label text="{i18n>Positions}"/>
 						<MultiComboBox id="multiComboBoxPositions"
 							items="{path: 'applmanModel>/Positions', sorter: {path: 'Name'}}"
 							selectionFinish="onPositionsFinished">
-							<core:Item key="{applmanModel>PositionId}" text="{applmanModel>Name}" />
+							<core:Item key="{applmanModel>PositionId}" text="{applmanModel>Name}"/>
 						</MultiComboBox>
-						<core:Title text="{i18n>Sources}" />
+						<core:Title text="{i18n>Sources}"/>
+						<Label text="{i18n>Sources}"/>
 						<MultiComboBox id="multiComboBoxSources" items="{path: 'applmanModel>/Sources'}"
 							selectionFinish="onSourcesFinished">
-							<core:Item key="{applmanModel>SourceId}" text="{applmanModel>Name}" />
+							<core:Item key="{applmanModel>SourceId}" text="{applmanModel>Name}"/>
 						</MultiComboBox>
 					</form:SimpleForm>
 				</WizardStep>
@@ -87,9 +89,13 @@
 						</Table>
 						<l:VerticalLayout class="sapUiLargeMarginTop">
 							<Title text="{i18n>Picture}" level="H2" />
-							<u:FileUploader id="fileUploader" name="myFileUpload"
-								uploadUrl="upload/" width="400px"
-								uploadComplete="onUploadComplete" />
+							<u:FileUploader id="pictureUploader" name="pictureUploader"
+								uploadUrl="https://applmanserverp1942281469trial.hanatrial.ondemand.com/applman/picture"
+								multiple="false"
+								additionalData="theApplicationId"
+								width="400px"
+								uploadComplete="onUploadComplete" 
+								fileSizeExceed="onPictureFileSizeExceeded"/>
 							<Button text="{i18n>UploadButton}" press="onUploadPress" />
 						</l:VerticalLayout>
 					</l:Grid>

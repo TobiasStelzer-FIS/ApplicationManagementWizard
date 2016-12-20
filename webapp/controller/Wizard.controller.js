@@ -358,7 +358,8 @@ sap.ui.define([
 		},
 
 		onUploadPress: function(oEvent) {
-
+			var oFileUploader = this.getView().byId("pictureUploader");
+			oFileUploader.upload();
 		}
 
 	});
