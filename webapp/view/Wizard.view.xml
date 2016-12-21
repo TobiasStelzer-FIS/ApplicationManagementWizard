@@ -90,13 +90,13 @@
 						<l:VerticalLayout class="sapUiLargeMarginTop">
 							<Title text="{i18n>Picture}" level="H2" />
 							<u:FileUploader id="pictureUploader" name="pictureUploader"
-								uploadUrl="https://applmanserverp1942281469trial.hanatrial.ondemand.com/applman/picture"
+								uploadUrl="https://applmanserverp1942281469trial.hanatrial.ondemand.com/applman/pictureupload"
 								multiple="false"
-								additionalData="theApplicationId"
+								value="{dataModel>/Applicant/Picture}"
 								width="400px"
 								uploadComplete="onUploadComplete" 
+								fileType="png,jpg,bmp,tiff"
 								fileSizeExceed="onPictureFileSizeExceeded"/>
-							<Button text="{i18n>UploadButton}" press="onUploadPress" />
 						</l:VerticalLayout>
 					</l:Grid>
 				</WizardStep>

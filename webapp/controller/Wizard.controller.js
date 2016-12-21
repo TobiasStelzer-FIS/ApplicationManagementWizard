@@ -60,7 +60,6 @@ sap.ui.define([
 					"Lastname": "Mustermann",
 					"Firstname": "Max",
 					"Birthdate": new Date(),
-					"Picture": "asdf",
 					"Street": "Himmelstraße 7",
 					"Zipcode": "98765",
 					"City": "Gottland",
@@ -149,6 +148,7 @@ sap.ui.define([
 					this._linkPositions(oData.ApplicationId, oModel);
 					this._linkSources(oData.ApplicationId, oModel);
 					this._linkStatus(oData.ApplicationId, oModel);
+					this._uploadPicture(oData.ApplicationId);
 					this._initialize();
 				}.bind(this)
 			});
@@ -208,6 +208,11 @@ sap.ui.define([
 			oModel.create("/Statuss('1')/$links/Applications", oLink);
 		},
 		
+		_uploadPicture: function(applicationId) {
+			var oFileUploader = this.getView().byId("pictureUploader");
+			oFileUploader.setAdditionalData(applicationId);
+			oFileUploader.upload();
+		},
 		/* =========================================================== */
 		/* event handlers general */
 		/* =========================================================== */
@@ -371,11 +376,6 @@ sap.ui.define([
 
 		onUploadComplete: function(oEvent) {
 
-		},
-
-		onUploadPress: function(oEvent) {
-			var oFileUploader = this.getView().byId("pictureUploader");
-			oFileUploader.upload();
 		}
 
 	});
