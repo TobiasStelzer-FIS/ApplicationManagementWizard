@@ -166,10 +166,16 @@ sap.ui.define([
 			var aPositions = this.getModel("dataModel").getProperty("/Positions");
 			// Link the Application with all Positions
 			for (var i = 0; i < aPositions.length; i++) {
+				// Application -> Position
 				var oLink = {
 					"uri": "https://applmanserverp1942281469trial.hanatrial.ondemand.com:443/applman/odata.srv/Positions('"+aPositions[i].PositionId+"')"
 				};
 				oModel.create("/Applications('" + applicationId + "')/$links/Positions", oLink);
+				// Position -> Application
+				oLink = {
+					"uri": "https://applmanserverp1942281469trial.hanatrial.ondemand.com:443/applman/odata.srv/Applications('"+applicationId+"')"
+				};
+				oModel.create("/Positions('" + aPositions[i].PositionId + "')/$links/Applications", oLink);
 			}
 		},
 		
@@ -185,10 +191,16 @@ sap.ui.define([
 			var aSources = this.getModel("dataModel").getProperty("/Sources");
 			// Link the Application with all Sources
 			for (var i = 0; i < aSources.length; i++) {
+				// Application -> Source
 				var oLink = {
 					"uri": "https://applmanserverp1942281469trial.hanatrial.ondemand.com:443/applman/odata.srv/Sources('"+aSources[i].SourceId+"')"
 				};
 				oModel.create("/Applications('" + applicationId + "')/$links/Sources", oLink);
+				// Source -> Application
+				oLink = {
+					"uri": "https://applmanserverp1942281469trial.hanatrial.ondemand.com:443/applman/odata.srv/Applications('"+applicationId+"')"
+				};
+				oModel.create("/Sources('" + aSources[i].SourceId + "')/$links/Applications", oLink);
 			}
 		},
 		
