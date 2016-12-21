@@ -14,7 +14,7 @@
 		"ach": "ach",
 		"dataSources": {
 			"applmanService": {
-				"uri": "/applman",
+				"uri": "/applman/odata.srv",
 				"type": "OData",
 				"settings": {
 					"odataVersion": "2.0"

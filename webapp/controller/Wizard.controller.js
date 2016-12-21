@@ -146,9 +146,10 @@ sap.ui.define([
 			oApplication.ApplicantDetails = oDataModel.getProperty("/Applicant");
 			oModel.create("/Applications", oApplication, {
 				success: function(oData) {
-					this._savePositions(oData.ApplicationId, oModel);
-					this._saveSources(oData.ApplicationId, oModel);
-					console.log(oData);
+					this._linkPositions(oData.ApplicationId, oModel);
+					this._linkSources(oData.ApplicationId, oModel);
+					this._linkStatus(oData.ApplicationId, oModel);
+					this._initialize();
 				}.bind(this)
 			});
 		},
@@ -161,12 +162,12 @@ sap.ui.define([
 		 * @param oModel: The ODataModel to send the request to
 		 * @private
 		 */
-		_savePositions: function(applicationId, oModel) {
+		_linkPositions: function(applicationId, oModel) {
 			var aPositions = this.getModel("dataModel").getProperty("/Positions");
 			// Link the Application with all Positions
 			for (var i = 0; i < aPositions.length; i++) {
 				var oLink = {
-					"uri": "http://localhost:8541/applman/odata.srv/Positions('"+aPositions[i].PositionId+"')"
+					"uri": "https://applmanserverp1942281469trial.hanatrial.ondemand.com:443/applman/odata.srv/Positions('"+aPositions[i].PositionId+"')"
 				};
 				oModel.create("/Applications('" + applicationId + "')/$links/Positions", oLink);
 			}
@@ -180,16 +181,31 @@ sap.ui.define([
 		 * @param oModel: The ODataModel to send the request to
 		 * @private
 		 */
-		_saveSources: function(applicationId, oModel) {
+		_linkSources: function(applicationId, oModel) {
 			var aSources = this.getModel("dataModel").getProperty("/Sources");
 			// Link the Application with all Sources
 			for (var i = 0; i < aSources.length; i++) {
 				var oLink = {
-					"uri": "http://localhost:8541/applman/odata.srv/Sources('"+aSources[i].SourceId+"')"
+					"uri": "https://applmanserverp1942281469trial.hanatrial.ondemand.com:443/applman/odata.srv/Sources('"+aSources[i].SourceId+"')"
 				};
 				oModel.create("/Applications('" + applicationId + "')/$links/Sources", oLink);
 			}
-			this._initialize();
+		},
+		
+		/**
+		 * Sends create-request to the service for establishing
+		 * a link between Status (with ID '1') and Application
+		 * 
+		 * @param applicationId: The Id of a previously created application
+		 * @param oModel: The ODataModel to send the request to
+		 * @private
+		 */
+		_linkStatus: function(applicationId, oModel) {
+			// Link the Application with the default Status
+			var oLink = {
+				"uri": "https://applmanserverp1942281469trial.hanatrial.ondemand.com:443/applman/odata.srv/Applications('"+applicationId+"')"
+			};
+			oModel.create("/Statuss('1')/$links/Applications", oLink);
 		},
 		
 		/* =========================================================== */
@@ -261,7 +277,7 @@ sap.ui.define([
 		 * @handler "selectionFinish" event of the MultiComboBox for Positions
 		 * @public
 		 */
-		onPositionsFinished: function() {
+		onPositionsFinished: function(oEvent) {
 			var aItems = oEvent.getParameter("selectedItems");
 			var aPositions = this.getModel("dataModel").getProperty("/Positions");
 			aPositions = [];
