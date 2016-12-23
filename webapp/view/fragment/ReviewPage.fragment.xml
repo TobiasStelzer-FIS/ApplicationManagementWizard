@@ -12,22 +12,22 @@
 						<core:Title text="{i18n>PersonalData}"/>
 					</form:title>
 					<form:FormElement label="{i18n>Gender}">
-						<Text text="{path: 'dataModel>/Applicant/Gender', formatter: '.formatter.genderKeyToName'}"/>
+						<Text text="{path: 'viewDataModel>/Applicant/Gender', formatter: '.formatter.genderKeyToName'}"/>
 					</form:FormElement>
 					<form:FormElement label="{i18n>Lastname}">
-						<Text text="{dataModel>/Applicant/Lastname}"/>
+						<Text text="{viewDataModel>/Applicant/Lastname}"/>
 					</form:FormElement>
 					<form:FormElement label="{i18n>Firstname}">
-						<Text text="{dataModel>/Applicant/Firstname}"/>
+						<Text text="{viewDataModel>/Applicant/Firstname}"/>
 					</form:FormElement>
 					<form:FormElement label="{i18n>Birthdate}">
-						<Text text="{dataModel>/Applicant/Birthdate}"/>
+						<Text text="{viewDataModel>/Applicant/Birthdate}"/>
 					</form:FormElement>
 					<form:FormElement label="{i18n>Street}">
-						<Text text="{dataModel>/Applicant/Street}"/>
+						<Text text="{viewDataModel>/Applicant/Street}"/>
 					</form:FormElement>
 					<form:FormElement label="{i18n>ZipCity}">
-						<Text text="{dataModel>/Applicant/Zipcode} {dataModel>/Applicant/City}"/>
+						<Text text="{viewDataModel>/Applicant/Zipcode} {viewDataModel>/Applicant/City}"/>
 					</form:FormElement>
 				</form:FormContainer>
 				
@@ -37,13 +37,13 @@
 						<core:Title text="{i18n>ContactData}"/>
 					</form:title>
 					<form:FormElement label="{i18n>Email}">
-						<Text text="{dataModel>/Applicant/Email}"/>
+						<Text text="{viewDataModel>/Applicant/Email}"/>
 					</form:FormElement>
 					<form:FormElement label="{i18n>Phone}">
-						<Text text="{dataModel>/Applicant/Phone}"/>
+						<Text text="{viewDataModel>/Applicant/Phone}"/>
 					</form:FormElement>
 					<form:FormElement label="{i18n>Mobile}">
-						<Text text="{dataModel>/Applicant/Mobile}"/>
+						<Text text="{viewDataModel>/Applicant/Mobile}"/>
 					</form:FormElement>
 					<form:FormElement label="">
 						<Text text=""/>
@@ -59,18 +59,18 @@
 				</form:layout>
 				
 				<!-- Shows only if there are Positions selected -->
-				<form:FormContainer formElements="{path: 'dataModel>/Positions'}" visible="{= ${dataModel>/Positions}.length !== 0}">
+				<form:FormContainer formElements="{path: 'viewDataModel>/Positions'}" visible="{= ${viewDataModel>/Positions}.length !== 0}">
 					<form:title>
 						<core:Title text="{i18n>Positions}"/>
 					</form:title>
 					<form:FormElement
-						label="{parts: [{path: 'dataModel>/Positions'}, {path: 'dataModel>PositionId'}], formatter: '.formatter.formatLabelStellen'}">
-						<Text text="• {dataModel>Name}"/>
+						label="{parts: [{path: 'viewDataModel>/Positions'}, {path: 'viewDataModel>PositionId'}], formatter: '.formatter.formatLabelStellen'}">
+						<Text text="• {viewDataModel>Name}"/>
 					</form:FormElement>
 				</form:FormContainer>
 				
 				<!-- Shows only if there are NO Positions selected -->
-				<form:FormContainer visible="{= ${dataModel>/Positions}.length === 0}">
+				<form:FormContainer visible="{= ${viewDataModel>/Positions}.length === 0}">
 					<form:title>
 						<core:Title text="{i18n>Positions}"/>
 					</form:title>
@@ -80,20 +80,20 @@
 				</form:FormContainer>
 				
 				<!-- Shows only if there are Sources selected -->
-				<form:FormContainer formElements="{path: 'dataModel>/Sources'}" visible="{= ${dataModel>/Sources}.length !== 0}">
+				<form:FormContainer formElements="{path: 'viewDataModel>/Sources'}" visible="{= ${viewDataModel>/Sources}.length !== 0}">
 					<form:title>
 						<core:Title text="{i18n>Sources}"/>
 					</form:title>
 					<form:FormElement
-						label="{parts: [{path: 'dataModel>/Sources'}, {path: 'dataModel>SourceId'}], formatter: '.formatter.formatLabelQuellen'}">
-						<Text text="• {dataModel>Name}"/>
+						label="{parts: [{path: 'viewDataModel>/Sources'}, {path: 'viewDataModel>SourceId'}], formatter: '.formatter.formatLabelQuellen'}">
+						<Text text="• {viewDataModel>Name}"/>
 						<Link press="editStepTwo" text="{i18n>EditButton}"
-							visible="{parts: [{path: 'dataModel>/Sources'}, {path: 'dataModel>SourceId'}], formatter: '.formatter.formatQuellenVisibleIfLast'}"/>
+							visible="{parts: [{path: 'viewDataModel>/Sources'}, {path: 'viewDataModel>SourceId'}], formatter: '.formatter.formatQuellenVisibleIfLast'}"/>
 					</form:FormElement>
 				</form:FormContainer>
 				
 				<!-- Shows only if there are NO Sources selected -->
-				<form:FormContainer visible="{= ${dataModel>/Sources}.length === 0}">
+				<form:FormContainer visible="{= ${viewDataModel>/Sources}.length === 0}">
 					<form:title>
 						<core:Title text="{i18n>Sources}"/>
 					</form:title>

@@ -75,16 +75,17 @@
 					"defaultOperationMode": "Server",
 					"defaultBindingMode": "TwoWay",
 					"defaultCountMode": "Inline",
-					"useBatch": false,
-					"json": true
+					"useBatch": false
 				},
 				"preload": true
 			}
 		},
 		"resources": {
-			"css": {
-				"uri": "css/style.css"
-			}
+			"css": [
+				{
+					"uri": "css/style.css"
+				}
+			]
 		},
 		"routing": {
 			"config": {

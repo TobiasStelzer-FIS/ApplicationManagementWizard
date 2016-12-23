@@ -8,12 +8,12 @@
 				complete="onWizardCompleted">
 				
 				<!-- Personal Data and Contact Data -->
-				<WizardStep title="{i18n>Steptitle1}" validated="true">
+				<WizardStep id="wizardStep1" title="{i18n>Steptitle1}" validated="false" activate="ononValidateStep1">
 					<form:SimpleForm id="formBewerber" editable="true"
 						layout="ResponsiveGridLayout">
 						<core:Title text="{i18n>PersonalData}" />
-						<Label text="{i18n>Gender}" />
-						<SegmentedButton selectedKey="{dataModel>/Applicant/Gender}">
+						<Label text="{i18n>Gender}"/>
+						<SegmentedButton selectedKey="{viewDataModel>/Applicant/Gender}">
 							<items>
 								<SegmentedButtonItem key="m" text="{i18n>Male}" />
 								<SegmentedButtonItem key="w"
@@ -21,34 +21,34 @@
 							</items>
 						</SegmentedButton>
 						<Label text="{i18n>Salutation}" />
-						<Input value="{dataModel>/Applicant/Salutation}" />
-						<Label text="{i18n>Lastname}" />
-						<Input value="{dataModel>/Applicant/Lastname}" />
-						<Label text="{i18n>Firstname}" />
-						<Input value="{dataModel>/Applicant/Firstname}" />
-						<Label text="{i18n>Birthdate}" />
-						<DatePicker dateValue="{dataModel>/Applicant/Birthdate}" />
-						<Label text="{i18n>Street}" />
-						<Input value="{dataModel>/Applicant/Street}" />
-						<Label text="{i18n>ZipCity}" />
-						<Input value="{dataModel>/Applicant/Zipcode}">
+						<Input value="{viewDataModel>/Applicant/Salutation}" />
+						<Label text="{i18n>Lastname}" required="true"/>
+						<Input value="{viewDataModel>/Applicant/Lastname}" valueState="{viewModel>/valueStateLastname}" liveChange="onValidateStep1"/>
+						<Label text="{i18n>Firstname}" required="true"/>
+						<Input value="{viewDataModel>/Applicant/Firstname}" valueState="{viewModel>/valueStateFirstname}" liveChange="onValidateStep1"/>
+						<Label text="{i18n>Birthdate}" required="true"/>
+						<DatePicker dateValue="{viewDataModel>/Applicant/Birthdate}" valueState="{viewModel>/valueStateBirthdate}" change="onValidateStep1"/>
+						<Label text="{i18n>Street}" required="true"/>
+						<Input value="{viewDataModel>/Applicant/Street}" valueState="{viewModel>/valueStateStreet}" liveChange="onValidateStep1"/>
+						<Label text="{i18n>ZipCity}" required="true"/>
+						<Input value="{viewDataModel>/Applicant/Zipcode}" valueState="{viewModel>/valueStateZipcode}" liveChange="onValidateStep1">
 							<layoutData>
 								<l:GridData span="L3 M12 S12" />
 							</layoutData>
 						</Input>
-						<Input value="{dataModel>/Applicant/City}" />
+						<Input value="{viewDataModel>/Applicant/City}" valueState="{viewModel>/valueStateCity}" liveChange="onValidateStep1"/>
 						<core:Title text="{i18n>ContactData}" />
 						<Label text="{i18n>Email}" />
-						<Input value="{dataModel>/Applicant/Email}" />
+						<Input value="{viewDataModel>/Applicant/Email}"/>
 						<Label text="{i18n>Phone}" />
-						<Input value="{dataModel>/Applicant/Phone}" />
+						<Input value="{viewDataModel>/Applicant/Phone}" />
 						<Label text="{i18n>Mobile}" />
-						<Input value="{dataModel>/Applicant/Mobile}" />
+						<Input value="{viewDataModel>/Applicant/Mobile}" />
 					</form:SimpleForm>
 				</WizardStep>
 				
 				<!-- Positions and Sources -->
-				<WizardStep validated="true" title="{i18n>Steptitle2}"
+				<WizardStep id="wizardStep2" validated="true" title="{i18n>Steptitle2}"
 					activate="additionalInfoValidation">
 					<form:SimpleForm editable="true">
 						<core:Title text="{i18n>Positions}"/>
@@ -68,31 +68,34 @@
 				</WizardStep>
 				
 				<!-- Documents and Picture -->
-				<WizardStep validated="true" title="{i18n>Steptitle3}"
+				<WizardStep id="wizardStep3" validated="true" title="{i18n>Steptitle3}"
 					activate="">
 					<l:Grid defaultSpan="XL6 L6 M12 S12" defaultIndent="XL0 L0 M0 S0">
-						<Table id="tableDateien" items="{path: 'bewerberModel>/Dateien'}"
+						<Table id="tableDocuments" items="{path: 'viewDataModel>/Documents'}"
 							noDataText="{i18n>NoDataTextFileTable}" inset="true" mode="Delete"
-							delete="onDeleteDatei" updateFinished="onDateienUpdateFinished">
+							delete="onDeleteDocument" updateFinished="onDocumentsUpdateFinished">
 							<headerToolbar>
 								<Toolbar>
-									<Title text="{wizardView>/dateienTitle}" level="H2" />
+									<Title text="{viewModel>/documentsTitle}" level="H2" />
 									<ToolbarSpacer />
-									<Button icon="sap-icon://add" press="onAddDatei" />
+									<Button icon="sap-icon://add" press="onAddDocument" />
 								</Toolbar>
 							</headerToolbar>
 							<items>
 								<ColumnListItem>
-									<Text text="{bewerberModel>Anzeigetext}" />
+									<Text text="{viewDataModel>Displaytext}" />
 								</ColumnListItem>
 							</items>
+							<columns>
+								<Column/>
+							</columns>
 						</Table>
 						<l:VerticalLayout class="sapUiLargeMarginTop">
 							<Title text="{i18n>Picture}" level="H2" />
 							<u:FileUploader id="pictureUploader" name="pictureUploader"
 								uploadUrl="https://applmanserverp1942281469trial.hanatrial.ondemand.com/applman/pictureupload"
 								multiple="false"
-								value="{dataModel>/Applicant/Picture}"
+								value="{viewDataModel>/Applicant/Picture}"
 								width="400px"
 								uploadComplete="onUploadComplete" 
 								fileType="png,jpg,bmp,tiff"

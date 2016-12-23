@@ -1,0 +1,33 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns:commons="sap.ui.commons" xmlns:l="sap.ui.layout" xmlns:form="sap.ui.layout.form"
+	xmlns:u="sap.ui.unified" xmlns="sap.m">
+	<Dialog title="{i18n>FileChooserDialogTitle}">
+		<form:Form>
+			<form:layout>
+				<form:ResponsiveGridLayout columnsM="2" singleContainerFullSize="false" adjustLabelSpan="false" labelSpanM="4" emptySpanM="0"/>
+			</form:layout>
+			<form:FormContainer>
+				<form:FormElement>
+					<form:label>
+						<Label text="{i18n>Displaytext}" required="true"/>
+					</form:label>
+					<Input value="{viewModel>Displaytext}"/>
+				</form:FormElement>
+				<form:FormElement>
+					<form:label>
+						<Label text="{i18n>File}" required="true"/>
+					</form:label>
+					<u:FileUploader name="fileUploader"
+								uploadUrl="https://applmanserverp1942281469trial.hanatrial.ondemand.com/applman/fileupload"
+								multiple="false"
+								value="{viewModel>Documentname}"
+								width="400px"
+								uploadComplete="onUploadFileComplete"/>
+				</form:FormElement>
+			</form:FormContainer>
+		</form:Form>
+		<buttons>
+			<Button id="btnFileSave" text="{i18n>SubmitButton}" press="onFileSave"/>
+			<Button id="btnFileCancel" text="{i18n>CancelButton}" press="onFileCancel"/>
+		</buttons>
+	</Dialog>
+</core:FragmentDefinition>
