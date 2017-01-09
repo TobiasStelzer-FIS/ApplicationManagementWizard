@@ -163,13 +163,18 @@ sap.ui.define([
 			var oApplication = oDataModel.getProperty("/Application");
 			oApplication.ApplicantDetails = oDataModel.getProperty("/Applicant");
 			oModel.create("/Applications", oApplication, {
+				
 				success: function(oData) {
+					console.log("all SUCCESS");
 					this._linkPositions(oData.ApplicationId, oModel);
 					this._linkSources(oData.ApplicationId, oModel);
 					this._linkStatus(oData.ApplicationId, oModel);
 					this._uploadPicture(oData.ApplicationId);
 					this._initialize();
-				}.bind(this)
+				}.bind(this),
+				error: function() {
+					console.log("all ERROR");
+				}
 			});
 		},
 

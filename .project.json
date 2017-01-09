@@ -3,5 +3,19 @@
     "account": "p1942281469trial",
     "name": "applicationmanagementwizard",
     "lastVersionWeTriedToDeploy": "1.0.0"
+  },
+  "mockpreview": {
+    "mockUri": "/applman/odata.srv",
+    "metadataFilePath": "",
+    "mockRequestsFilePath": "",
+    "loadJSONFiles": false,
+    "loadCustomRequests": false
+  },
+  "translation": {
+    "translationDomain": "",
+    "supportedLanguages": "",
+    "defaultLanguage": "",
+    "defaultI18NPropertyFile": "",
+    "resourceModelName": ""
   }
 }
