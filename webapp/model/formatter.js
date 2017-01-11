@@ -35,6 +35,22 @@ sap.ui.define(function() {
 				return oBundle.getText("Sources");
 			}
 			return "";
+		},
+		
+		formatLabelDocuments: function(aItems, sCurrentDocumentname) {
+			var oBundle = this.getModel("i18n").getResourceBundle();
+			if (aItems[0].Documentname === sCurrentDocumentname) {
+				return oBundle.getText("Documents");
+			}
+			return "";
+		},
+		
+		formatPictureText: function(sFilename) {
+			var oBundle = this.getModel("i18n").getResourceBundle();
+			if (!sFilename || sFilename === "") {
+				return oBundle.getText("NoDataTextPicture");
+			}
+			return sFilename;
 		}
 
 	};

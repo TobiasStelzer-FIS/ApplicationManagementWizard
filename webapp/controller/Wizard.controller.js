@@ -4,8 +4,10 @@ sap.ui.define([
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
 	"sap/m/MessageBox",
+	"sap/m/Dialog",
+	"sap/m/FlexBox",
 	"de/fis/applicationwizard/model/formatter"
-], function(BaseController, JSONModel, Filter, FilterOperator, MessageBox, formatter) {
+], function(BaseController, JSONModel, Filter, FilterOperator, MessageBox, Dialog, FlexBox, formatter) {
 	"use strict";
 
 	return BaseController.extend("de.fis.applicationwizard.controller.Wizard", {
@@ -18,6 +20,7 @@ sap.ui.define([
 			var oDataModel = this.getModel("applmanModel");
 			oDataModel.metadataLoaded().then(this._onMetadataLoaded.bind(this));
 
+			this._serviceroot = "https://applmanserverp1942281469trial.hanatrial.ondemand.com:443";
 			this._oWizard = oView.byId("CreateApplicationWizard");
 			this._oNavContainer = oView.byId("wizardNavContainer");
 			this._oWizardContentPage = this.getView().byId("wizardContentPage");
@@ -48,9 +51,11 @@ sap.ui.define([
 		_initialize: function() {
 			var oMultiBoxPositions = this.getView().byId("multiComboBoxPositions");
 			var oMultiBoxSources = this.getView().byId("multiComboBoxSources");
+			var oHiddenUploadContainer = this.getView().byId("hiddenUploadContainer");
 
 			oMultiBoxPositions.clearSelection();
 			oMultiBoxSources.clearSelection();
+			oHiddenUploadContainer.removeAllItems();
 
 			var oDataModel = new JSONModel({
 				"Application": {
@@ -68,11 +73,12 @@ sap.ui.define([
 					"Email": "",
 					"Phone": "",
 					"Mobile": "",
-					"Gender": "m"
+					"Gender": "m",
+					"Picture": ""
 				},
+				"Documents": [],
 				"Positions": [],
-				"Sources": [],
-				"Documents": []
+				"Sources": []
 			});
 
 			this.setModel(oDataModel, "viewDataModel");
@@ -163,13 +169,13 @@ sap.ui.define([
 			var oApplication = oDataModel.getProperty("/Application");
 			oApplication.ApplicantDetails = oDataModel.getProperty("/Applicant");
 			oModel.create("/Applications", oApplication, {
-				
 				success: function(oData) {
 					console.log("all SUCCESS");
 					this._linkPositions(oData.ApplicationId, oModel);
 					this._linkSources(oData.ApplicationId, oModel);
 					this._linkStatus(oData.ApplicationId, oModel);
 					this._uploadPicture(oData.ApplicationId);
+					this._uploadFiles(oData.ApplicationId);
 					this._initialize();
 				}.bind(this),
 				error: function() {
@@ -192,13 +198,13 @@ sap.ui.define([
 			for (var i = 0; i < aPositions.length; i++) {
 				// Application -> Position
 				var oLink = {
-					"uri": "https://applmanserverp1942281469trial.hanatrial.ondemand.com:443/applman/odata.srv/Positions('" + aPositions[i].PositionId +
+					"uri": this._serviceroot + "/applman/odata.srv/Positions('" + aPositions[i].PositionId +
 						"')"
 				};
 				oModel.create("/Applications('" + applicationId + "')/$links/Positions", oLink);
 				// Position -> Application
 				oLink = {
-					"uri": "https://applmanserverp1942281469trial.hanatrial.ondemand.com:443/applman/odata.srv/Applications('" + applicationId +
+					"uri": this._serviceroot + "/applman/odata.srv/Applications('" + applicationId +
 						"')"
 				};
 				oModel.create("/Positions('" + aPositions[i].PositionId + "')/$links/Applications", oLink);
@@ -219,13 +225,13 @@ sap.ui.define([
 			for (var i = 0; i < aSources.length; i++) {
 				// Application -> Source
 				var oLink = {
-					"uri": "https://applmanserverp1942281469trial.hanatrial.ondemand.com:443/applman/odata.srv/Sources('" + aSources[i].SourceId +
+					"uri": this._serviceroot + "/applman/odata.srv/Sources('" + aSources[i].SourceId +
 						"')"
 				};
 				oModel.create("/Applications('" + applicationId + "')/$links/Sources", oLink);
 				// Source -> Application
 				oLink = {
-					"uri": "https://applmanserverp1942281469trial.hanatrial.ondemand.com:443/applman/odata.srv/Applications('" + applicationId +
+					"uri": this._serviceroot + "/applman/odata.srv/Applications('" + applicationId +
 						"')"
 				};
 				oModel.create("/Sources('" + aSources[i].SourceId + "')/$links/Applications", oLink);
@@ -241,9 +247,14 @@ sap.ui.define([
 		 * @private
 		 */
 		_linkStatus: function(applicationId, oModel) {
-			// Link the Application with the default Status
+			// Application -> Status
 			var oLink = {
-				"uri": "https://applmanserverp1942281469trial.hanatrial.ondemand.com:443/applman/odata.srv/Applications('" + applicationId + "')"
+				"uri": this._serviceroot + "/applman/odata.srv/Statuss('1')"
+			};
+			oModel.update("/Applications('" + applicationId + "')/$links/StatusDetails", oLink);
+			// Status -> Application
+			oLink = {
+				"uri": this._serviceroot + "/applman/odata.srv/Applications('" + applicationId + "')"
 			};
 			oModel.create("/Statuss('1')/$links/Applications", oLink);
 		},
@@ -253,9 +264,84 @@ sap.ui.define([
 			oFileUploader.setAdditionalData(applicationId);
 			oFileUploader.upload();
 		},
+
+		_uploadFiles: function(applicationId) {
+			var oViewDataModel = this.getModel("viewDataModel");
+			var aDocuments = oViewDataModel.getProperty("/Documents");
+
+			var container = this.getView().byId("hiddenUploadContainer");
+			var items = container.getItems();
+
+			for (var i = 0; i < items.length; i++) {
+				var uploader = items[i];
+
+				uploader.attachUploadComplete({applicationId: applicationId}, this.onDocumentUploadComplete, this);
+
+				uploader.setAdditionalData(applicationId);
+				uploader.upload();
+			}
+		},
+
+		_createDocument: function(oDocument, applicationId, oModel) {
+			oModel.create("/Documents", oDocument, {
+				success: function(oData) {
+					this._linkDocument(oData.DocumentId, applicationId, oModel);
+				}.bind(this),
+				error: function() {
+					console.log("Error when creating document");
+				}
+			});
+		},
+
+		_linkDocument: function(documentId, applicationId, oModel) {
+			// Document -> Application
+			var oLink = {
+				"uri": this._serviceroot + "/applman/odata.srv/Applications('" + applicationId + "')"
+			};
+			oModel.update("/Documents('" + documentId + "')/$links/ApplicationDetails", oLink);
+			// Application -> Document
+			oLink = {
+				"uri": this._serviceroot + "/applman/odata.srv/Documents('" + documentId + "')"
+			};
+			oModel.create("/Applications('" + applicationId + "')/$links/Documents", oLink);
+		},
+
 		/* =========================================================== */
 		/* event handlers general */
 		/* =========================================================== */
+
+		onDocumentUploadComplete: function(oEvent, oData) {
+			var uploader = oEvent.getSource();
+			var response = oEvent.getParameter("response");
+			var status = oEvent.getParameter("state");
+			var documentname = oEvent.getParameter("fileName");
+			var oModel = this.getModel("applmanModel");
+			var oViewDataModel = this.getModel("viewDataModel");
+			
+			documentname = uploader.getValue();
+			
+			if (documentname) {
+				// File was successfully uploaded
+				var displayname = "";
+				var aDocuments = oViewDataModel.getProperty("/Documents");
+				for (var i = 0; i < aDocuments.length; i++) {
+					if (aDocuments[i].Documentname === documentname) {
+						displayname = aDocuments[i].Displayname;
+					}
+				}
+				if (displayname === "") {
+					displayname = documentname;
+				}
+				var oDocument = {
+					"Documentname": documentname,
+					"Displaytext": displayname
+				};
+				this._createDocument(oDocument, oData.applicationId, oModel);
+			} else {
+				// There was an error
+				console.log("Error when uploading document: " + oDocument);
+			}
+		},
 
 		/**
 		 * Navigates to the ReviewPage
@@ -311,15 +397,15 @@ sap.ui.define([
 		_validateStep1: function() {
 			var oViewModel = this.getModel("viewModel");
 			var oViewDataModel = this.getModel("viewDataModel");
-			
+
 			var oApplicant = oViewDataModel.getProperty("/Applicant");
 			var successState = "Success";
-			
-//			oApplicant.Lastname.length<1 ? oViewModel.setProperty("/valueStateLastname", "Error") : oViewModel.setProperty("/valueStateLastname", successState);
-//			oApplicant.Firstname.length<1 ? oViewModel.setProperty("/valueStateFirstname", "Error") : oViewModel.setProperty("/valueStateFirstname", successState);
-//			oApplicant.Street.length<1 ? oViewModel.setProperty("/valueStateStreet", "Error") : oViewModel.setProperty("/valueStateStreet", successState);
-//			oApplicant.Zipcode.length<1 ? oViewModel.setProperty("/valueStateZipcode", "Error") : oViewModel.setProperty("/valueStateZipcode", successState);
-//			oApplicant.City.length<1 ? oViewModel.setProperty("/valueStateCity", "Error") : oViewModel.setProperty("/valueStateCity", successState);
+
+			//			oApplicant.Lastname.length<1 ? oViewModel.setProperty("/valueStateLastname", "Error") : oViewModel.setProperty("/valueStateLastname", successState);
+			//			oApplicant.Firstname.length<1 ? oViewModel.setProperty("/valueStateFirstname", "Error") : oViewModel.setProperty("/valueStateFirstname", successState);
+			//			oApplicant.Street.length<1 ? oViewModel.setProperty("/valueStateStreet", "Error") : oViewModel.setProperty("/valueStateStreet", successState);
+			//			oApplicant.Zipcode.length<1 ? oViewModel.setProperty("/valueStateZipcode", "Error") : oViewModel.setProperty("/valueStateZipcode", successState);
+			//			oApplicant.City.length<1 ? oViewModel.setProperty("/valueStateCity", "Error") : oViewModel.setProperty("/valueStateCity", successState);
 
 			if (oApplicant.Gender.length < 1 ||
 				oApplicant.Lastname.length < 1 ||
@@ -333,7 +419,7 @@ sap.ui.define([
 				this._oWizard.validateStep(this.getView().byId("wizardStep1"));
 			}
 		},
-		
+
 		/* =========================================================== */
 		/* event handlers review page */
 		/* =========================================================== */
@@ -355,6 +441,16 @@ sap.ui.define([
 		 */
 		editStepTwo: function() {
 			this._handleNavigationToStep(1);
+		},
+
+		/**
+		 * Navigates back to the third Step of the Wizard
+		 * 
+		 * @handler "press" event of the edit-Link in the third section (ReviewPage)
+		 * @public
+		 */
+		editStepThree: function() {
+			this._handleNavigationToStep(2);
 		},
 
 		/* =========================================================== */
@@ -431,16 +527,50 @@ sap.ui.define([
 		 */
 		onAddDocument: function(oEvent) {
 			var oViewModel = this.getModel("viewModel");
-
-			oViewModel.setProperty("/DocumentTemp", {});
-
 			var oDialog = this._openFileChooserDialog();
+
+			// create the FileUploader control
+			var oFileUploader = new sap.ui.unified.FileUploader({
+				uploadUrl: "https://applmanserverp1942281469trial.hanatrial.ondemand.com/applman/fileupload",
+				name: "documentUploader",
+				uploadOnChange: false,
+				multiple: false,
+				width: "400px"
+			});
+			oFileUploader.attachChange(this.onUploaderChange, this);
+			
+			// attach it to the page
+			var container = this.getView().byId("uploadContainer");
+			container.removeAllFields();
+			container.addField(oFileUploader);
+
+			var oDocumentTemp = {
+				uploader: oFileUploader
+			};
+
+			oViewModel.setProperty("/DocumentTemp", oDocumentTemp);
+
 			oDialog.bindElement({
 				path: "/DocumentTemp",
 				model: "viewModel"
 			});
 		},
 
+		onUploaderChange: function(oEvent) {
+			var newValue = oEvent.getParameter("newValue");
+			var oViewModel = this.getModel("viewModel");
+			var oDocumentTemp = oViewModel.getProperty("/DocumentTemp");
+			
+			console.log(oDocumentTemp);
+			if (oDocumentTemp) {
+				if (!oDocumentTemp.Displaytext || oDocumentTemp.Displaytext === "") {
+					oDocumentTemp.Displaytext = newValue;
+					console.log(oDocumentTemp);
+					oViewModel.setProperty("/DocumentTemp", oDocumentTemp);
+				}
+			}
+		},
+		
 		/**
 		 * Handles the process of deleting a new file
 		 * 
@@ -455,24 +585,35 @@ sap.ui.define([
 			var sPath = oBindingContext.getPath();
 			var nIndex = parseInt(sPath.substring(sPath.length - 1, sPath.length));
 			var aDocuments = oViewDataModel.getProperty("/Documents");
-
+			aDocuments = aDocuments.slice(0);
 			aDocuments.splice(nIndex, 1);
 			oViewDataModel.setProperty("/Documents", aDocuments);
 		},
 
-		onFileSave: function(oEvent) {
+		onDocumentSave: function(oEvent) {
 			var oViewDataModel = this.getModel("viewDataModel");
 			var oViewModel = this.getModel("viewModel");
 
 			var oDocument = oViewModel.getProperty("/DocumentTemp");
+			oDocument.Documentname = oDocument.uploader.getValue();
+			
+			this.getView().byId("hiddenUploadContainer").addItem(oDocument.uploader);
+
 			var aDocuments = oViewDataModel.getProperty("/Documents");
+			if (aDocuments.length === 0) {
+				aDocuments = [];
+			} else {
+				aDocuments = aDocuments.slice(0);
+			}
 			aDocuments.push(oDocument);
 			oViewDataModel.setProperty("/Documents", aDocuments);
+			oViewModel.setProperty("/DocumentTemp", null);
 
+			oViewDataModel.updateBindings();
 			this._closeDialog();
 		},
 
-		onFileCancel: function(oEvent) {
+		onDocumentCancel: function(oEvent) {
 			this._closeDialog();
 		},
 

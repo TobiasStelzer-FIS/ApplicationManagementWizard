@@ -5,7 +5,6 @@
 				<form:layout>
 					<form:ResponsiveGridLayout/>
 				</form:layout>
-				
 				<!-- Personal Data -->
 				<form:FormContainer>
 					<form:title>
@@ -30,7 +29,6 @@
 						<Text text="{viewDataModel>/Applicant/Zipcode} {viewDataModel>/Applicant/City}"/>
 					</form:FormElement>
 				</form:FormContainer>
-				
 				<!-- Contact Data -->
 				<form:FormContainer>
 					<form:title>
@@ -51,13 +49,11 @@
 					</form:FormElement>
 				</form:FormContainer>
 			</form:Form>
-			
 			<!-- Positions and Sources -->
 			<form:Form title="{i18n>Steptitle2}" editable="false">
 				<form:layout>
 					<form:ResponsiveGridLayout/>
 				</form:layout>
-				
 				<!-- Shows only if there are Positions selected -->
 				<form:FormContainer formElements="{path: 'viewDataModel>/Positions'}" visible="{= ${viewDataModel>/Positions}.length !== 0}">
 					<form:title>
@@ -68,7 +64,6 @@
 						<Text text="• {viewDataModel>Name}"/>
 					</form:FormElement>
 				</form:FormContainer>
-				
 				<!-- Shows only if there are NO Positions selected -->
 				<form:FormContainer visible="{= ${viewDataModel>/Positions}.length === 0}">
 					<form:title>
@@ -78,7 +73,6 @@
 						<Text text="{i18n>NoDataTextPositions}"/>
 					</form:FormElement>
 				</form:FormContainer>
-				
 				<!-- Shows only if there are Sources selected -->
 				<form:FormContainer formElements="{path: 'viewDataModel>/Sources'}" visible="{= ${viewDataModel>/Sources}.length !== 0}">
 					<form:title>
@@ -91,7 +85,6 @@
 							visible="{parts: [{path: 'viewDataModel>/Sources'}, {path: 'viewDataModel>SourceId'}], formatter: '.formatter.formatQuellenVisibleIfLast'}"/>
 					</form:FormElement>
 				</form:FormContainer>
-				
 				<!-- Shows only if there are NO Sources selected -->
 				<form:FormContainer visible="{= ${viewDataModel>/Sources}.length === 0}">
 					<form:title>
@@ -103,6 +96,41 @@
 					<form:FormElement label="">
 						<Text text=""/>
 						<Link press="editStepTwo" text="{i18n>EditButton}"/>
+					</form:FormElement>
+				</form:FormContainer>
+			</form:Form>
+			<form:Form title="{i18n>Files}" minWidth="1024" editable="false">
+				<form:layout>
+					<form:ResponsiveGridLayout/>
+				</form:layout>
+				<!-- Shows only if there are Documents selected -->
+				<form:FormContainer formElements="{path: 'viewDataModel>/Documents'}"
+					visible="{= ${viewDataModel>/Documents}.length !== 0}">
+					<form:title>
+						<core:Title text="{i18n>Documents}"/>
+					</form:title>
+					<form:FormElement
+						label="{parts: [{path: 'viewDataModel>/Documents'}, {path: 'viewDataModel>Documentname'}], formatter: '.formatter.formatLabelDocuments'}">
+						<Text text="• {viewDataModel>Displaytext}"/>
+					</form:FormElement>
+				</form:FormContainer>
+				<!-- Shows only if there are NO Documents selected -->
+				<form:FormContainer visible="{= ${viewDataModel>/Documents}.length === 0}">
+					<form:title>
+						<core:Title text="{i18n>Documents}"/>
+					</form:title>
+					<form:FormElement label="{i18n>Documents}">
+						<Text text="{i18n>NoDataTextDocuments}"/>
+					</form:FormElement>
+				</form:FormContainer>
+				<!-- Picture -->
+				<form:FormContainer>
+					<form:title>
+						<core:Title text="{i18n>Picture}"/>
+					</form:title>
+					<form:FormElement label="{i18n>Dateiname}">
+						<Text text="{path: 'viewDataModel>/Applicant/Picture', formatter: '.formatter.formatPictureText'}"/>
+						<Link press="editStepThree" text="{i18n>EditButton}"/>
 					</form:FormElement>
 				</form:FormContainer>
 			</form:Form>

@@ -12,22 +12,25 @@
 					</form:label>
 					<Input value="{viewModel>Displaytext}"/>
 				</form:FormElement>
-				<form:FormElement>
+				<form:FormElement id="uploadContainer">
 					<form:label>
 						<Label text="{i18n>File}" required="true"/>
 					</form:label>
-					<u:FileUploader name="fileUploader"
+<!--
+					<u:FileUploader id="fileUploader"
+								name="fileUploader"
 								uploadUrl="https://applmanserverp1942281469trial.hanatrial.ondemand.com/applman/fileupload"
 								multiple="false"
 								value="{viewModel>Documentname}"
 								width="400px"
 								uploadComplete="onUploadFileComplete"/>
+-->
 				</form:FormElement>
 			</form:FormContainer>
 		</form:Form>
 		<buttons>
-			<Button id="btnFileSave" text="{i18n>SubmitButton}" press="onFileSave"/>
-			<Button id="btnFileCancel" text="{i18n>CancelButton}" press="onFileCancel"/>
+			<Button id="btnFileSave" text="{i18n>SubmitButton}" press="onDocumentSave"/>
+			<Button id="btnFileCancel" text="{i18n>CancelButton}" press="onDocumentCancel"/>
 		</buttons>
 	</Dialog>
 </core:FragmentDefinition>
