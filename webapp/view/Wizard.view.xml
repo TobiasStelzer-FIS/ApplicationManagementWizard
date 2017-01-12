@@ -1,7 +1,7 @@
 <mvc:View controllerName="de.fis.applicationwizard.controller.Wizard" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc"
 	xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:form="sap.ui.layout.form" xmlns:u="sap.ui.unified" xmlns="sap.m">
 	<NavContainer id="wizardNavContainer">
-		<Page id="wizardContentPage" title="{i18n>PageTitle}">
+		<Page id="wizardContentPage" title="{i18n>PageTitle}" enableScrolling="false">
 			<Wizard id="CreateApplicationWizard" finishButtonText="{i18n>FinishButtonText}" complete="onWizardCompleted">
 				<!-- Personal Data and Contact Data -->
 				<WizardStep id="wizardStep1" title="{i18n>Steptitle1}" validated="true">
@@ -46,12 +46,12 @@
 						<core:Title text="{i18n>Positions}"/>
 						<Label text="{i18n>Positions}"/>
 						<MultiComboBox id="multiComboBoxPositions" items="{path: 'applmanModel>/Positions', sorter: {path: 'Name'}}"
-							selectionFinish="onPositionsFinished">
+							selectionFinish="onPositionsFinished" width="100%">
 							<core:Item key="{applmanModel>PositionId}" text="{applmanModel>Name}"/>
 						</MultiComboBox>
 						<core:Title text="{i18n>Sources}"/>
 						<Label text="{i18n>Sources}"/>
-						<MultiComboBox id="multiComboBoxSources" items="{path: 'applmanModel>/Sources'}" selectionFinish="onSourcesFinished">
+						<MultiComboBox id="multiComboBoxSources" items="{path: 'applmanModel>/Sources'}" selectionFinish="onSourcesFinished" width="100%">
 							<core:Item key="{applmanModel>SourceId}" text="{applmanModel>Name}"/>
 						</MultiComboBox>
 					</form:SimpleForm>
@@ -81,7 +81,7 @@
 							<Title text="{i18n>Picture}" level="H2"/>
 							<u:FileUploader id="pictureUploader" name="pictureUploader"
 								uploadUrl="https://applmanserverp1942281469trial.hanatrial.ondemand.com/applman/fileupload" multiple="false"
-								value="{viewDataModel>/Applicant/Picture}" width="400px" uploadComplete="onUploadComplete" fileType="png,jpg,bmp,tiff"
+								value="{viewDataModel>/Applicant/Picture}" width="100%" uploadComplete="onPictureUploadComplete" fileType="png,jpg,bmp,tiff"
 								fileSizeExceed="onPictureFileSizeExceeded"/>
 						</l:VerticalLayout>
 					</l:Grid>

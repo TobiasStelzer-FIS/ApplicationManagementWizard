@@ -6,8 +6,9 @@ sap.ui.define([
 	"sap/m/MessageBox",
 	"sap/m/Dialog",
 	"sap/m/FlexBox",
+	"sap/m/MessageToast",
 	"de/fis/applicationwizard/model/formatter"
-], function(BaseController, JSONModel, Filter, FilterOperator, MessageBox, Dialog, FlexBox, formatter) {
+], function(BaseController, JSONModel, Filter, FilterOperator, MessageBox, Dialog, FlexBox, MessageToast, formatter) {
 	"use strict";
 
 	return BaseController.extend("de.fis.applicationwizard.controller.Wizard", {
@@ -272,11 +273,10 @@ sap.ui.define([
 			var container = this.getView().byId("hiddenUploadContainer");
 			var items = container.getItems();
 
-			for (var i = 0; i < items.length; i++) {
-				var uploader = items[i];
+			for (var i = 0; i < aDocuments.length; i++) {
+				var uploader = aDocuments[i].uploader;
 
 				uploader.attachUploadComplete({applicationId: applicationId}, this.onDocumentUploadComplete, this);
-
 				uploader.setAdditionalData(applicationId);
 				uploader.upload();
 			}
@@ -310,6 +310,12 @@ sap.ui.define([
 		/* event handlers general */
 		/* =========================================================== */
 
+		onDocumentUploadComplete2: function(oEvent) {
+			var response = oEvent.getParameter("response");
+			var filename = oEvent.getParameter("fileName");
+			console.log(filename);		// response = undefined
+		},
+
 		onDocumentUploadComplete: function(oEvent, oData) {
 			var uploader = oEvent.getSource();
 			var response = oEvent.getParameter("response");
@@ -317,8 +323,10 @@ sap.ui.define([
 			var documentname = oEvent.getParameter("fileName");
 			var oModel = this.getModel("applmanModel");
 			var oViewDataModel = this.getModel("viewDataModel");
-			
+
 			documentname = uploader.getValue();
+			console.log("Response");
+			console.log(response);
 			
 			if (documentname) {
 				// File was successfully uploaded
@@ -534,10 +542,12 @@ sap.ui.define([
 				uploadUrl: "https://applmanserverp1942281469trial.hanatrial.ondemand.com/applman/fileupload",
 				name: "documentUploader",
 				uploadOnChange: false,
+				maximumFileSize: 1,
 				multiple: false,
-				width: "400px"
+				width: "100%"
 			});
 			oFileUploader.attachChange(this.onUploaderChange, this);
+			oFileUploader.attachFileSizeExceed(this.onFilesizeExceeded, this);
 			
 			// attach it to the page
 			var container = this.getView().byId("uploadContainer");
@@ -571,6 +581,10 @@ sap.ui.define([
 			}
 		},
 		
+		onFilesizeExceeded: function() {
+			MessageToast.show("Dateigröße überschritten. Max. Größe: 1MB");
+		},
+		
 		/**
 		 * Handles the process of deleting a new file
 		 * 
@@ -580,6 +594,7 @@ sap.ui.define([
 		 */
 		onDeleteDocument: function(oEvent) {
 			var oViewDataModel = this.getModel("viewDataModel");
+			var hiddenUploadContainer = this.getView().byId("hiddenUploadContainer");
 			var oItem = oEvent.getParameter("listItem");
 			var oBindingContext = oItem.getBindingContext("viewDataModel");
 			var sPath = oBindingContext.getPath();
@@ -588,24 +603,23 @@ sap.ui.define([
 			aDocuments = aDocuments.slice(0);
 			aDocuments.splice(nIndex, 1);
 			oViewDataModel.setProperty("/Documents", aDocuments);
+			hiddenUploadContainer.removeItem(nIndex);
 		},
 
 		onDocumentSave: function(oEvent) {
 			var oViewDataModel = this.getModel("viewDataModel");
 			var oViewModel = this.getModel("viewModel");
-
+			var hiddenUploadContainer = this.getView().byId("hiddenUploadContainer");
+			
 			var oDocument = oViewModel.getProperty("/DocumentTemp");
 			oDocument.Documentname = oDocument.uploader.getValue();
 			
-			this.getView().byId("hiddenUploadContainer").addItem(oDocument.uploader);
-
 			var aDocuments = oViewDataModel.getProperty("/Documents");
-			if (aDocuments.length === 0) {
-				aDocuments = [];
-			} else {
-				aDocuments = aDocuments.slice(0);
-			}
+			aDocuments = aDocuments.slice(0);
 			aDocuments.push(oDocument);
+			
+			hiddenUploadContainer.addItem(oDocument.uploader);
+			
 			oViewDataModel.setProperty("/Documents", aDocuments);
 			oViewModel.setProperty("/DocumentTemp", null);
 
@@ -617,8 +631,10 @@ sap.ui.define([
 			this._closeDialog();
 		},
 
-		onUploadComplete: function(oEvent) {
-
+		onPictureUploadComplete: function(oEvent) {
+			var response = oEvent.getParameters("response");
+			console.log("Picture Response");
+			console.log(response);
 		}
 
 	});
