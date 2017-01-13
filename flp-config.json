@@ -13,10 +13,10 @@
     },
     "assignment": {
         "groups": [
-            "fae3c0a9-4a3e-4657-bbe3-4c927e159580"
+            "00000000-0000-1111-0000-00000000"
         ],
         "contentPackages": [
-            "628fb1fb-9ed2-49ca-acb5-2dcc1ccaf74a"
+            "00000000-0000-2222-0000-00000000"
         ],
         "categories": []
     },
@@ -25,7 +25,7 @@
         "title": "Application Wizard",
         "subtitle": "Create Applications",
         "searchKeywords": "Application Wizard,Create Applications",
-        "displayIconUrl": "sap-icon://approvals",
+        "displayIconUrl": "sap-icon://activity-individual",
         "displayInfoText": "",
         "size": "1x1",
         "serviceURL": "",

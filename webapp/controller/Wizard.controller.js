@@ -276,7 +276,9 @@ sap.ui.define([
 			for (var i = 0; i < aDocuments.length; i++) {
 				var uploader = aDocuments[i].uploader;
 
-				uploader.attachUploadComplete({applicationId: applicationId}, this.onDocumentUploadComplete, this);
+				uploader.attachUploadComplete({
+					applicationId: applicationId
+				}, this.onDocumentUploadComplete, this);
 				uploader.setAdditionalData(applicationId);
 				uploader.upload();
 			}
@@ -313,42 +315,56 @@ sap.ui.define([
 		onDocumentUploadComplete2: function(oEvent) {
 			var response = oEvent.getParameter("response");
 			var filename = oEvent.getParameter("fileName");
-			console.log(filename);		// response = undefined
+			console.log(filename); // response = undefined
 		},
 
+		/**
+		 * Handles the uploadComplete event of the FileUploaders which upload the documents
+		 * 
+		 * @handler "uploadComplete" event of the FileUploader
+		 * @public
+		 */
 		onDocumentUploadComplete: function(oEvent, oData) {
 			var uploader = oEvent.getSource();
-			var response = oEvent.getParameter("response");
-			var status = oEvent.getParameter("state");
-			var documentname = oEvent.getParameter("fileName");
+			var documentname = uploader.getValue();
+
+			var fileURI = "/applman/filedownload/" + oData.applicationId + "/" + documentname + "?exists";
+			$.get(fileURI, function(data) {
+				if (data === "true") {
+					// Successfully uploaded document
+					this.handleDocumentUploadSuccess(documentname, oData.applicationId);
+				} else {
+					// Error when uploading document
+				}
+			}.bind(this));
+		},
+
+		/**
+		 * Handles the process if a document was succesfully uploaded
+		 * Starts the process of creating the 
+		 * 
+		 * @handler "uploadComplete" event of the FileUploader
+		 * @public
+		 */
+		handleDocumentUploadSuccess: function(sDocumentname, applicationId) {
+			console.log("handleDocumentUploadSuccess("+sDocumentname+", "+applicationId+")");
 			var oModel = this.getModel("applmanModel");
 			var oViewDataModel = this.getModel("viewDataModel");
-
-			documentname = uploader.getValue();
-			console.log("Response");
-			console.log(response);
-			
-			if (documentname) {
-				// File was successfully uploaded
-				var displayname = "";
-				var aDocuments = oViewDataModel.getProperty("/Documents");
-				for (var i = 0; i < aDocuments.length; i++) {
-					if (aDocuments[i].Documentname === documentname) {
-						displayname = aDocuments[i].Displayname;
-					}
+			var displayname = "";
+			var aDocuments = oViewDataModel.getProperty("/Documents");
+			for (var i = 0; i < aDocuments.length; i++) {
+				if (aDocuments[i].Documentname === sDocumentname) {
+					displayname = aDocuments[i].Displayname;
 				}
-				if (displayname === "") {
-					displayname = documentname;
-				}
-				var oDocument = {
-					"Documentname": documentname,
-					"Displaytext": displayname
-				};
-				this._createDocument(oDocument, oData.applicationId, oModel);
-			} else {
-				// There was an error
-				console.log("Error when uploading document: " + oDocument);
 			}
+			if (displayname === "") {
+				displayname = sDocumentname;
+			}
+			var oDocument = {
+				"Documentname": sDocumentname,
+				"Displaytext": displayname
+			};
+			this._createDocument(oDocument, applicationId, oModel);
 		},
 
 		/**
@@ -542,13 +558,13 @@ sap.ui.define([
 				uploadUrl: "https://applmanserverp1942281469trial.hanatrial.ondemand.com/applman/fileupload",
 				name: "documentUploader",
 				uploadOnChange: false,
-				maximumFileSize: 1,
+				maximumFileSize: 50,
 				multiple: false,
 				width: "100%"
 			});
 			oFileUploader.attachChange(this.onUploaderChange, this);
 			oFileUploader.attachFileSizeExceed(this.onFilesizeExceeded, this);
-			
+
 			// attach it to the page
 			var container = this.getView().byId("uploadContainer");
 			container.removeAllFields();
@@ -570,7 +586,7 @@ sap.ui.define([
 			var newValue = oEvent.getParameter("newValue");
 			var oViewModel = this.getModel("viewModel");
 			var oDocumentTemp = oViewModel.getProperty("/DocumentTemp");
-			
+
 			console.log(oDocumentTemp);
 			if (oDocumentTemp) {
 				if (!oDocumentTemp.Displaytext || oDocumentTemp.Displaytext === "") {
@@ -580,11 +596,11 @@ sap.ui.define([
 				}
 			}
 		},
-		
+
 		onFilesizeExceeded: function() {
 			MessageToast.show("Dateigröße überschritten. Max. Größe: 1MB");
 		},
-		
+
 		/**
 		 * Handles the process of deleting a new file
 		 * 
@@ -610,16 +626,16 @@ sap.ui.define([
 			var oViewDataModel = this.getModel("viewDataModel");
 			var oViewModel = this.getModel("viewModel");
 			var hiddenUploadContainer = this.getView().byId("hiddenUploadContainer");
-			
+
 			var oDocument = oViewModel.getProperty("/DocumentTemp");
 			oDocument.Documentname = oDocument.uploader.getValue();
-			
+
 			var aDocuments = oViewDataModel.getProperty("/Documents");
 			aDocuments = aDocuments.slice(0);
 			aDocuments.push(oDocument);
-			
+
 			hiddenUploadContainer.addItem(oDocument.uploader);
-			
+
 			oViewDataModel.setProperty("/Documents", aDocuments);
 			oViewModel.setProperty("/DocumentTemp", null);
 
